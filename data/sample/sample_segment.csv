@@ -1,0 +1,6 @@
+customer_id,gender,join_date,auto_renew,usage_score,discount_rate,membership_level
+CUST001,M,2023-01-15,1,85,10,Gold
+CUST002,F,2023-03-22,0,45,0,Silver
+CUST003,M,2022-11-05,1,92,15,Platinum
+CUST004,F,2024-01-10,0,30,0,Bronze
+CUST005,M,2023-07-18,1,60,5,Silver

@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: stitch_mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: stitch_db
+    volumes:
+      - ./backend/db_init:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/mysql
+
+  data_pipeline:
+    build:
+      context: ./backend
+    container_name: stitch_pipeline
+    depends_on:
+      - db
+    volumes:
+      # 로컬의 data/server 폴더와 컨테이너 내부를 연결하여 CSV 파일 공유
+      - ./data/server:/app/data/server
+    env_file:
+      - .env
+
+volumes:
+  db_data:
