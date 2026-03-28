@@ -1,6 +1,7 @@
 import streamlit as st
 from src.components.metrics import render_metrics_row
 from src.components.charts import render_trend_section
+from src.components.dashboard_modules import render_dashboard_modules
 from src.utils.data_loader import load_ui_config
 
 def render_dashboard():
@@ -31,3 +32,6 @@ def render_dashboard():
     
     # 섹션 2: 메인 트렌드 차트 
     render_trend_section()
+    
+    # 섹션 3: 하단 모듈
+    render_dashboard_modules()

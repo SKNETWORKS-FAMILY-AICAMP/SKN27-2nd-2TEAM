@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as st_pd
 from src.design.styles import COLORS
 from src.utils.data_loader import load_ui_config, load_chart_data
 
@@ -23,24 +22,20 @@ def render_main_trend_chart():
         """
     )
     
-    # 캐싱된 차트 데이터 로드
     df = load_chart_data()
-    
-    # Streamlit line_chart 로 대체 (더 부드럽고 네이티브한 경험을 위해)
-    # df의 'week' 컬럼을 인덱스로 설정하여 x축으로 사용
-    chart_data = df.set_index('week')
-    
-    # Streamlit 네이티브 차트는 커스터마이징에 한계가 있으므로,
-    # 시각적 유사도를 위해 간단한 커스텀 HTML/SVG 또는 Altair를 사용할 수 있지만
-    # 여기서는 요구사항에 맞게 Streamlit area_chart/line_chart를 사용하되 색상을 primary로 맞춤
-    st.line_chart(chart_data, color=COLORS["primary"], height=250)
+    # x/y를 명시해 단일 시리즈만 그리면, 다중 열일 때 나오는 시리즈 선택 UI가 생기지 않습니다.
+    st.area_chart(
+        df,
+        x="week",
+        y="active_users",
+        color=COLORS["primary"],
+        height=320,
+    )
 
 
 def render_trend_section():
     """
     트렌드 차트를 포함하는 섹션 렌더링
     """
-    with st.container():
-        st.html('<div class="metric-card h-full">')
+    with st.container(border=True):
         render_main_trend_chart()
-        st.html('</div>')

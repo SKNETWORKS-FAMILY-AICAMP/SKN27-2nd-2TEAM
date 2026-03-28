@@ -3,7 +3,6 @@ from src.design.styles import inject_custom_css
 from src.components.sidebar import render_sidebar
 from src.screens.dashboard import render_dashboard
 from src.screens.analysis import render_analysis
-from src.screens.model import render_model
 
 def main():
     # 1. Streamlit 페이지 기본 설정
@@ -28,10 +27,8 @@ def main():
     
     if current_page == "Home":
         render_dashboard()
-    elif current_page == "Customer Analysis":
+    elif current_page == "Analysis":
         render_analysis()
-    elif current_page == "Model":
-        render_model()
 
 if __name__ == "__main__":
     main()

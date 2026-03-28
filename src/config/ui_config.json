@@ -4,39 +4,41 @@
     "subtitle": "Precision Curator",
     "menu": {
       "Home": "🏠 Home",
-      "Customer Analysis": "📉 고객 분석",
-      "Model": "⚙️ 모델 정보"
+      "Analysis": "📈 고객 이탈 분석"
     }
   },
   "dashboard": {
     "header": {
-      "title": "📊 고객 모니터링 대시보드",
-      "description": "데이터 기반 고객 경험 최적화 및 이탈 예측 분석"
+      "title": "📊 Netflix 대시보드 메인",
+      "description": "구독자 현황 및 이탈 관련 핵심 지표 모니터링"
     }
   },
   "analysis": {
     "header": {
-      "title": "📉 고객 분석",
-      "description": "특정 고객 데이터를 선택하여 예측 모델 결과를 확인하고 시각화 정보를 제공하는 페이지입니다."
+      "title": "📈 고객 이탈 시뮬레이터",
+      "description": "고객 세그먼트를 선택하고 행동 데이터 및 요금제 변경에 따른 이탈 확률을 비교 분석합니다."
     },
     "customer_selection": {
-      "label": "분석할 고객 데이터를 선택하세요:",
-      "help": "MySQL 데이터베이스에서 불러온 고객 목록입니다.",
-      "options": [
-        "고객 A (ID: 10001) - 최근 방문: 2일 전",
-        "고객 B (ID: 10002) - 최근 방문: 15일 전",
-        "고객 C (ID: 10003) - 최근 방문: 30일 전",
-        "고객 D (ID: 10004) - 최근 방문: 3달 전"
-      ]
+      "label": "분석할 고객/세그먼트 선택",
+      "help": "예측 대상이 되는 사용자 그룹을 선택하세요."
     },
-    "info_template": "선택된 **{customer}**에 대한 학습 모델 예측 결과 및 시각화 데이터가 이곳에 표시될 예정입니다."
-  },
-  "model": {
-    "header": {
-      "title": "⚙️ 모델 정보",
-      "description": "모델에 대한 설명과 모델링 과정의 시각화 정보가 표시됩니다."
+    "form": {
+      "title": "파라미터 조정",
+      "subscription_type_label": "요금제 유형",
+      "subscription_type_options": ["Basic", "Standard", "Premium"],
+      "monthly_revenue_label": "월 청구액 ($)",
+      "viewing_hours_label": "주간 시청 시간 (시간)",
+      "customer_support_calls_label": "고객 지원 문의 횟수",
+      "button_label": "시뮬레이션 실행"
     },
-    "info": "이곳에 모델 관련 상세 설명 및 시각화 데이터가 들어갈 예정입니다."
+    "result": {
+      "title": "이탈 확률 예측",
+      "gauge_label": "이탈 위험도"
+    },
+    "churn_compare_chart": {
+      "title": "이탈률 분포 비교 (Current vs Simulated)",
+      "caption": "선택 세그먼트 기준(현재)과 시뮬레이션 결과를 동일 구간에서 빈도로 비교한 참고용 차트입니다."
+    }
   },
   "charts": {
     "trend_section": {

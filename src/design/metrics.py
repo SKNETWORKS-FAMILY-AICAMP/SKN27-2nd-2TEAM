@@ -5,75 +5,79 @@ def get_metrics_css():
     KPI 카드(metrics) 컴포넌트에만 적용되는 CSS 스타일을 반환합니다.
     """
     return textwrap.dedent("""
-        /* 지표 카드 - 1단계 */
+        /* 지표 카드 - Stitch 대시보드 기준 */
         .metric-card {
-            background-color: #ffffff; /* surface-container-lowest */
+            background-color: #ffffff; /* bg-white */
             border-radius: 0.75rem; /* rounded-xl */
             padding: 1.5rem; /* p-6 */
+            border: 1px solid #f1f5f9; /* border-slate-100 */
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
         }
         
         .metric-card:hover {
-            /* 앰비언트 그림자 */
-            box-shadow: 0 12px 40px rgba(25, 28, 31, 0.06);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             transform: translateY(-2px);
         }
 
-        /* 아이콘 배지 */
+        /* 아이콘 배지 (Stitch 테마 컬러) */
         .icon-badge {
-            padding: 0.5rem;
-            border-radius: 0.5rem;
+            padding: 0.5rem; /* p-2 */
+            border-radius: 0.5rem; /* rounded-lg */
             display: inline-flex;
             align-items: center;
             justify-content: center;
         }
 
-        .icon-badge.primary { background-color: #ffdad7; color: #b81120; }
-        .icon-badge.secondary { background-color: #d6e3ff; color: #005db6; }
-        .icon-badge.orange { background-color: #ffedd5; color: #c2410c; }
-        .icon-badge.tertiary { background-color: #7ff7df; color: #00685a; }
+        .icon-badge.primary { background-color: #fef2f2; color: #b91c1c; } /* bg-red-50 text-red-700 */
+        .icon-badge.secondary { background-color: #eff6ff; color: #1d4ed8; } /* bg-blue-50 text-blue-700 */
+        .icon-badge.orange { background-color: #fff7ed; color: #c2410c; } /* bg-orange-50 text-orange-700 */
+        .icon-badge.tertiary { background-color: #f0fdfa; color: #0f766e; } /* bg-teal-50 text-teal-700 */
 
         /* 증감 태그 */
         .change-tag {
-            font-size: 0.75rem;
-            font-weight: 700;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 700; /* font-bold */
+            padding: 0.25rem 0.5rem; /* px-2 py-1 */
+            border-radius: 0.25rem; /* rounded */
         }
-        .change-tag.positive { background-color: #f0fdf4; color: #16a34a; }
-        .change-tag.negative { background-color: #fef2f2; color: #dc2626; }
+        .change-tag.positive { background-color: #f0fdf4; color: #16a34a; } /* bg-green-50 text-green-600 */
+        .change-tag.negative { background-color: #fef2f2; color: #dc2626; } /* bg-red-50 text-red-600 */
         
         /* 지표 카드 내부 요소들 */
         .metric-card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 1rem;
+            margin-bottom: 1rem; /* mb-4 */
         }
         
         .metric-card-title {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: #64748b;
+            font-size: 0.625rem; /* text-[10px] */
+            font-weight: 700; /* font-bold */
+            color: #94a3b8; /* text-slate-400 */
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin: 0 0 0.25rem 0;
+            letter-spacing: 0.1em; /* tracking-widest */
+            margin: 0 0 0.25rem 0; /* mb-1 */
         }
         
         .metric-card-value {
-            font-size: 1.875rem;
-            font-weight: 900;
-            color: #191c1f;
+            font-size: 1.875rem; /* text-3xl */
+            font-weight: 900; /* font-black */
+            color: #0f172a; /* text-slate-900 */
             margin: 0;
+            display: flex;
+            align-items: baseline;
+            gap: 0.25rem;
         }
         
         .metric-card-emoji {
-            font-size: 0.875rem;
-            font-weight: 400;
-            color: #94a3b8;
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 400; /* font-normal */
+            color: #cbd5e1; /* text-slate-300 */
         }
     """)
