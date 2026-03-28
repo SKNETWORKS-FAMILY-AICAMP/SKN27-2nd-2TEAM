@@ -43,7 +43,7 @@ data/**/*.csv
 # 테스트/뼈대 샘플은 깃에 포함하려면 아래 주석 해제 (팀원과 상의)
 !data/sample/sample_segment.csv
 !data/server/segment_output.csv
-!data/sample/*
+!data/sample/*.csv
 *.xlsx
 *.xls
 *.db
