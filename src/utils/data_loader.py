@@ -1,7 +1,13 @@
 import json
 import pandas as pd
 import streamlit as st
-from src.config.config import UI_CONFIG_PATH, METRICS_DATA_PATH, CHART_DATA_PATH, SIMULATOR_DATA_PATH
+from src.config.config import (
+    UI_CONFIG_PATH,
+    METRICS_DATA_PATH,
+    CHART_DATA_PATH,
+    SIMULATOR_DATA_PATH,
+    DASHBOARD_MODULES_DATA_PATH,
+)
 
 @st.cache_data
 def load_ui_config():
@@ -28,3 +34,10 @@ def load_chart_data():
 def load_simulator_data():
     """시뮬레이터 샘플 데이터 CSV 파일을 로드합니다."""
     return pd.read_csv(SIMULATOR_DATA_PATH)
+
+
+@st.cache_data
+def load_dashboard_modules_data():
+    """대시보드 하단 3모듈용 JSON 데이터를 로드합니다."""
+    with open(DASHBOARD_MODULES_DATA_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)

@@ -1,4 +1,10 @@
 {
+  "app": {
+    "page_title": "Customer Insights - Analytics Pro",
+    "page_icon": "📊",
+    "layout": "wide",
+    "initial_sidebar_state": "expanded"
+  },
   "sidebar": {
     "title": "Analytics Pro",
     "subtitle": "Precision Curator",
@@ -24,6 +30,7 @@
     },
     "form": {
       "title": "파라미터 조정",
+      "section_icon": "tune",
       "subscription_type_label": "요금제 유형",
       "subscription_type_options": ["Basic", "Standard", "Premium"],
       "monthly_revenue_label": "월 청구액 ($)",
@@ -34,6 +41,17 @@
     "result": {
       "title": "이탈 확률 예측",
       "gauge_label": "이탈 위험도"
+    },
+    "compare_cards": {
+      "kpi_current_label": "현재 예상 이탈율",
+      "kpi_simulated_label": "시뮬레이션 이탈율",
+      "badge_current": "Current"
+    },
+    "ai_comment": {
+      "title": "AI 분석 코멘트",
+      "risk_high": "이탈 위험도가 상승했습니다. 즉각적인 개입이 필요합니다.",
+      "risk_low": "안정적인 구독 유지 상태를 보여줍니다.",
+      "summary_template": "선택하신 <strong>{segment}</strong> 세그먼트에 대해 조정된 파라미터로 분석한 결과, 이탈율이 <strong>{projected}</strong> 로 예측됩니다."
     },
     "churn_compare_chart": {
       "title": "이탈률 분포 비교 (Current vs Simulated)",

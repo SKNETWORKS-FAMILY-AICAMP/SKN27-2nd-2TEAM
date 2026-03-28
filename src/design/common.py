@@ -1,28 +1,29 @@
 import textwrap
 
-# 색상 (Stitch Tailwind Config + Tailwind 기본 색상 참조)
+# 앱 전역에서 쓰는 팔레트 (차트 색상·인라인 스타일·CSS 변수 치환에 사용)
 COLORS = {
-    "primary": "#e50914", # Netflix Red 느낌 (Stitch에서는 b81120 / FF4B4B 혼용)
-    "primary_light": "#fef2f2", # bg-red-50
-    "primary_dark": "#b91c1c", # text-red-700
-    "secondary": "#005db6",
-    "background": "#f8fafc", # bg-slate-50
-    "surface": "#ffffff", # bg-white
-    "text_main": "#0f172a", # text-slate-900
-    "text_muted": "#64748b", # text-slate-500
-    "border": "#f1f5f9" # border-slate-100
+    "primary": "#e50914",  # 메인 강조, 차트 시리즈, 브랜드 포인트
+    "primary_light": "#fef2f2",  # primary 아이콘 배경·밝은 강조면
+    "primary_dark": "#b91c1c",  # primary보다 진한 텍스트/아이콘
+    "secondary": "#005db6",  # 보조 강조(링크·보조 브랜드 톤 등)
+    "background": "#f8fafc",  # 앱·메인 영역 바탕
+    "surface": "#ffffff",  # 카드·패널 등 올라오는 면
+    "text_main": "#0f172a",  # 본문·제목 기본 글자색
+    "text_muted": "#64748b",  # 부가 설명·보조 텍스트
+    "border": "#f1f5f9",  # 구분선·카드 테두리
 }
 
 def get_common_css():
     """
-    앱 전체에 공통적으로 적용되는 기본 CSS 스타일을 반환합니다.
-    (폰트, 레이아웃 조정, Streamlit 기본 설정 오버라이드 등)
+    앱 전역 CSS. 폰트·배경·메인 패딩·컬럼 간격·페이지 헤더(.page-header)·스페이서 등
+    사이드바/지표/차트 모듈과 겹치지 않는 공통 레이어만 둡니다.
     """
     return textwrap.dedent(f"""
-        /* 구글 폰트 및 머티리얼 심볼 */
+        /* --- 타이포: 본문 폰트 + 아이콘 폰트 로드 (대시보드·사이드바 공통) --- */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0');
 
+        /* --- 전역 타이포·배경: Streamlit 루트와 위젯 래퍼 기본 글꼴·색 --- */
         html, body, [class*="css"] {{
             font-family: 'Inter', sans-serif !important;
             background-color: {COLORS["background"]};
@@ -31,17 +32,17 @@ def get_common_css():
             -moz-osx-font-smoothing: grayscale;
         }}
 
-        /* Streamlit 메인 배경 */
+        /* --- 앱 셸: 메인 캔버스 배경 (사이드바 제외 영역) --- */
         .stApp {{
             background-color: {COLORS["background"]};
         }}
 
-        /* 확장 버튼이 보이도록 상단 헤더를 숨기지 않고 투명하게 만듦 */
+        /* --- 상단 헤더: 기본 흰 배경을 없애 전체 배경과 이어지게 (햄버거·테마 등 유지) --- */
         header[data-testid="stHeader"] {{
             background-color: transparent !important;
         }}
         
-        /* 전역 조정 */
+        /* --- 메인 콘텐츠 폭·여백: wide 레이아웃에서 좌우 패딩·최대 너비 (Stitch 레이아웃에 맞춤) --- */
         .main .block-container {{
             padding-top: 3rem !important; 
             padding-left: 2.5rem !important;
@@ -50,17 +51,17 @@ def get_common_css():
             max-width: 1600px !important; /* Stitch 컨테이너 사이즈 */
         }}
 
-        /* Streamlit 컬럼 간격 조정 */
+        /* --- 컬럼: st.columns 간 시각적 간격 (카드 그리드 정렬) --- */
         [data-testid="column"] {{
             padding: 0 0.5rem !important;
         }}
         
-        /* 카드가 넘치거나 잘못 쌓이는 것을 방지하기 위해 마크다운 컨테이너 여백 수정 */
+        /* --- 마크다운 블록: 카드형 st.markdown이 가로 100%를 쓰도록 (줄바꿈·넘침 방지) --- */
         .element-container > .stMarkdown {{
             width: 100%;
         }}
         
-        /* 페이지 헤더 공통 스타일 (Stitch 디자인 기반) */
+        /* --- 페이지 타이틀 블록: Home / Analysis 상단 제목·설명 (markup.page_header_* 와 짝) --- */
         .page-header {{
             margin-bottom: 2.5rem;
         }}
@@ -84,7 +85,7 @@ def get_common_css():
             font-size: 1rem;
         }}
         
-        /* 여백 */
+        /* --- 세로 여백: 섹션 사이 빈 div (markup.spacer_std 등) --- */
         .spacer-2_5 {{
             height: 2.5rem;
         }}

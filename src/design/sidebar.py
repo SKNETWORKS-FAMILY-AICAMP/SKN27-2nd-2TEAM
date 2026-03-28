@@ -2,19 +2,20 @@ import textwrap
 
 def get_sidebar_css():
     """
-    사이드바 컴포넌트에만 적용되는 CSS 스타일을 반환합니다.
+    왼쪽 사이드바 전용. 배경·커스텀 내비(st.sidebar.radio)·헤더 HTML(.sidebar-*)·
+    Streamlit 기본 네비 숨김 등 `sidebar.py` + `markup.sidebar_*` 와 맞춘 스타일입니다.
     """
     return textwrap.dedent("""
-        /* 사이드바가 항상 보이고 확장된 상태 유지 */
+        /* --- 사이드바 패널 배경 (메인 영역과 톤 구분) --- */
         [data-testid="stSidebar"] {
             background-color: #f8fafc !important; /* slate-100 */
         }
-        /* 사이드바는 보이게 하되 내비게이션 링크만 숨김 */
+        /* --- Streamlit 기본 페이지 목록 숨김 (커스텀 라디오만 사용) --- */
         [data-testid="stSidebarNav"] {
             display: none !important;
         }
 
-        /* Streamlit radio button 커스터마이징 (Navigation) */
+        /* --- 내비게이션: 라디오를 메뉴 버튼처럼 보이게 (호버·선택 강조) --- */
         div.stRadio > div[role="radiogroup"] {
             gap: 0.25rem;
         }
@@ -42,11 +43,11 @@ def get_sidebar_css():
             font-weight: 500 !important;
             letter-spacing: -0.025em !important;
         }
-        /* 라디오 버튼 동그라미 숨기기 */
+        /* --- 라디오 원형 UI 숨김 (텍스트만 메뉴 스타일) --- */
         div.stRadio > div[role="radiogroup"] span[data-baseweb="radio"] div:first-child {
             display: none !important;
         }
-        /* 사이드바 헤더 */
+        /* --- 사이드바 상단 타이틀 (markup.sidebar_header) --- */
         .sidebar-header {
             padding: 1rem 0 2.5rem 0;
         }
@@ -66,7 +67,7 @@ def get_sidebar_css():
             margin: 0;
         }
         
-        /* 사이드바 여백 */
+        /* --- 하단 영역 밀어 올리기용 플렉스 여백 (markup.sidebar_spacer) --- */
         .sidebar-spacer {
             flex-grow: 1;
             height: 30vh;

@@ -1,0 +1,45 @@
+{
+  "plan_distribution": {
+    "title": "구독 플랜별 분포",
+    "icon": "pie_chart",
+    "icon_badge": "secondary",
+    "rows": [
+      {"label": "Premium (4K)", "pct": 48, "bar_color": "#b91c1c"},
+      {"label": "Standard (HD)", "pct": 34, "bar_color": "#2563eb"},
+      {"label": "Basic with Ads", "pct": 18, "bar_color": "#94a3b8"}
+    ]
+  },
+  "churn_reasons": {
+    "title": "주요 이탈 사유",
+    "icon": "format_list_bulleted",
+    "icon_badge": "orange",
+    "rows": [
+      {"label": "보고 싶은 콘텐츠 부족", "value": "32%"},
+      {"label": "가격 부담 (구독료)", "value": "28%"},
+      {"label": "타 서비스 이동", "value": "22%"},
+      {"label": "사용 빈도 감소", "value": "18%"}
+    ]
+  },
+  "recent_sessions": {
+    "title": "최근 분석 세션",
+    "icon": "history",
+    "icon_badge": "tertiary",
+    "rows": [
+      {
+        "dot_color": "#22c55e",
+        "title": "APAC 지역 이탈 패턴 분석 완료",
+        "meta": "5분 전 • AI Agent Alpha"
+      },
+      {
+        "dot_color": "#f97316",
+        "title": "광고 요금제 전환율 감소 감지",
+        "meta": "2시간 전 • Batch #402"
+      },
+      {
+        "dot_color": "#3b82f6",
+        "title": "분기별 리텐션 보고서 생성",
+        "meta": "4시간 전 • System Admin"
+      }
+    ]
+  }
+}

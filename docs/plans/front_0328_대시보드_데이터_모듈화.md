@@ -30,6 +30,13 @@
 - **config 구조 개편**: `data/sample` 디렉토리에 위치해 있던 UX/UI 관련 구성용 파일(`ui_config.json`, `metrics.json`)을 단순 데이터 파일과 구분하기 위해 `src/config` 디렉토리로 이동시켰습니다.
 - **경로 관리 스크립트 이동**: `src/config.py` 파일도 `src/config/config.py`로 이동시키고, 내부 파일 경로 및 관련 import 문(`src/utils/data_loader.py` 등)들을 업데이트했습니다.
 
+## 2026년 03월 28일 추가 작업 내역 (페이지 설정 모듈화)
+- **`st.set_page_config` 분리**: 브라우저 탭 제목·파비콘(이모지)·레이아웃·초기 사이드바 상태를 [`src/config/ui_config.json`](../../src/config/ui_config.json) 최상위 키 `app`에 정의했습니다 (`page_title`, `page_icon`, `layout`, `initial_sidebar_state`).
+- **적용 함수**: [`src/design/styles.py`](../../src/design/styles.py)에 `apply_streamlit_page_config()`를 추가해 `load_ui_config()`로 `app` 블록을 읽은 뒤 `st.set_page_config`를 호출합니다. 앱 엔트리 [`main.py`](../../main.py)에서는 해당 함수만 호출하도록 정리했습니다.
+
+## 2026년 03월 28일 HTML 마크업 집약 (별도 기록)
+- `st.html`용 HTML 조각을 [`src/design/markup.py`](../../src/design/markup.py)로 모으고, 대시보드 하단 3모듈 데이터는 [`data/sample/dashboard_modules.json`](../../data/sample/dashboard_modules.json), 분석 화면 비교/AI 문구는 `ui_config.json`의 `analysis.compare_cards`·`ai_comment` 등으로 이전했습니다. 상세 체크리스트·비고는 [`docs/plans/front_html_markup_refactor.md`](front_html_markup_refactor.md)를 참고하세요.
+
 ## 향후 계획
 - 루트 디렉토리의 `data/sample` 폴더를 활용하여 구조를 정립 완료.
 - 추후 실제 API 또는 DB를 통해 데이터를 받아올 때, `src/utils/data_loader.py`의 유틸리티 로더 내부 로직만 수정하면 화면 코드 수정 없이 손쉽게 연동이 가능합니다.
