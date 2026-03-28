@@ -1,3 +1,9 @@
+"""
+앱 전역 왼쪽 사이드바: 브랜딩 헤더 HTML + 페이지 전환용 라디오.
+
+- `ui_config.json`의 `sidebar` 메뉴/타이틀
+- `st.session_state.current_page`와 동기화 (main.py 라우팅과 연결)
+"""
 import streamlit as st
 from src.design import markup
 from src.utils.data_loader import load_ui_config

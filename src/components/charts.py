@@ -1,3 +1,9 @@
+"""
+대시보드(Home) 메인 영역의 트렌드 차트 블록.
+
+- `ui_config.json`의 `charts.trend_section` 제목·아이콘
+- `chart_data.csv` 시계열을 `st.area_chart`로 표시
+"""
 import streamlit as st
 from src.design import markup
 from src.design.common import COLORS

@@ -37,6 +37,7 @@
 
 ## 비고
 
+- 분석 화면(`src/screens/analysis.py`)의 차트 제목·캡션, KPI 라벨, AI 코멘트 등은 `ui_config.json`의 `analysis.churn_compare_chart` / `compare_cards` / `ai_comment`만 소스로 사용한다. 해당 키에 대한 Python 기본 dict 폴백은 두지 않는다.
 - 사용자·CSV에서 오는 값(세그먼트명 등)은 `html.escape`로 이스케이프 후 삽입.
 - 색상 코드는 `#` + 6자리 hex만 허용(`_safe_hex_color`), 그 외는 fallback.
 - Jinja 등 추가 의존성 없음.

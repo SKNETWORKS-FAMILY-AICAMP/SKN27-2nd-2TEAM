@@ -1,3 +1,9 @@
+"""
+Home 라우트 화면: Netflix 스타일 대시보드 메인.
+
+구성: 페이지 헤더 → KPI 행 → 트렌드 차트 → 하단 3모듈.
+`main.py`에서 `current_page == "Home"` 일 때만 호출됩니다.
+"""
 import streamlit as st
 from src.components.metrics import render_metrics_row
 from src.components.charts import render_trend_section

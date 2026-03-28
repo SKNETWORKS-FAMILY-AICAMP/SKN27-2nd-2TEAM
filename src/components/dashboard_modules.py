@@ -1,3 +1,9 @@
+"""
+대시보드 하단 3열 모듈: 플랜 분포 / 이탈 사유 / 최근 세션.
+
+- 문구·수치는 `data/sample/dashboard_modules.json` 단일 소스
+- `markup`에서 카드 HTML 조립
+"""
 import streamlit as st
 from src.design import markup
 from src.utils.data_loader import load_dashboard_modules_data
