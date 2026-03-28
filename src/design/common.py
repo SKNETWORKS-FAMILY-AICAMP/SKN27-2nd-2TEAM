@@ -1,6 +1,6 @@
 import textwrap
 
-# Colors
+# 색상
 COLORS = {
     "primary": "#b81120",
     "secondary": "#005db6",
@@ -14,7 +14,7 @@ def get_common_css():
     (폰트, 레이아웃 조정, Streamlit 기본 설정 오버라이드 등)
     """
     return textwrap.dedent("""
-        /* Google Fonts & Material Symbols */
+        /* 구글 폰트 및 머티리얼 심볼 */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0');
 
@@ -24,17 +24,17 @@ def get_common_css():
             color: #191c1f; /* on-surface */
         }
 
-        /* Streamlit Main Background */
+        /* Streamlit 메인 배경 */
         .stApp {
             background-color: #f2f4f8;
         }
 
-        /* Make top header transparent instead of hiding it, so expand button is visible */
+        /* 확장 버튼이 보이도록 상단 헤더를 숨기지 않고 투명하게 만듦 */
         header[data-testid="stHeader"] {
             background-color: transparent !important;
         }
         
-        /* Global Adjustments */
+        /* 전역 조정 */
         .main .block-container {
             padding-top: 2rem !important; 
             padding-left: 2.5rem !important;
@@ -43,17 +43,17 @@ def get_common_css():
             max-width: 100%;
         }
 
-        /* Streamlit columns gap adjustment */
+        /* Streamlit 컬럼 간격 조정 */
         [data-testid="column"] {
             padding: 0 !important;
         }
         
-        /* Fix markdown container margin to prevent cards from overflowing or stacking incorrectly */
+        /* 카드가 넘치거나 잘못 쌓이는 것을 방지하기 위해 마크다운 컨테이너 여백 수정 */
         .element-container > .stMarkdown {
             width: 100%;
         }
         
-        /* Ensure containers stretch to fill height in flex columns */
+        /* 플렉스 컬럼에서 컨테이너가 높이를 채우도록 확장 */
         div[data-testid="stVerticalBlockBorderWrapper"] {
             height: 100%;
         }
@@ -61,7 +61,7 @@ def get_common_css():
             height: 100%;
         }
         
-        /* Page Header Common Styles */
+        /* 페이지 헤더 공통 스타일 */
         .page-header {
             margin-bottom: 2.5rem;
         }
@@ -84,7 +84,7 @@ def get_common_css():
             font-size: 1rem;
         }
         
-        /* Spacer */
+        /* 여백 */
         .spacer-2_5 {
             height: 2.5rem;
         }

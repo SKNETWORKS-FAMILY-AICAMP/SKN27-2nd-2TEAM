@@ -1,0 +1,47 @@
+{
+  "sidebar": {
+    "title": "Analytics Pro",
+    "subtitle": "Precision Curator",
+    "menu": {
+      "Home": "🏠 Home",
+      "Customer Analysis": "📉 고객 분석",
+      "Model": "⚙️ 모델 정보"
+    }
+  },
+  "dashboard": {
+    "header": {
+      "title": "📊 고객 모니터링 대시보드",
+      "description": "데이터 기반 고객 경험 최적화 및 이탈 예측 분석"
+    }
+  },
+  "analysis": {
+    "header": {
+      "title": "📉 고객 분석",
+      "description": "특정 고객 데이터를 선택하여 예측 모델 결과를 확인하고 시각화 정보를 제공하는 페이지입니다."
+    },
+    "customer_selection": {
+      "label": "분석할 고객 데이터를 선택하세요:",
+      "help": "MySQL 데이터베이스에서 불러온 고객 목록입니다.",
+      "options": [
+        "고객 A (ID: 10001) - 최근 방문: 2일 전",
+        "고객 B (ID: 10002) - 최근 방문: 15일 전",
+        "고객 C (ID: 10003) - 최근 방문: 30일 전",
+        "고객 D (ID: 10004) - 최근 방문: 3달 전"
+      ]
+    },
+    "info_template": "선택된 **{customer}**에 대한 학습 모델 예측 결과 및 시각화 데이터가 이곳에 표시될 예정입니다."
+  },
+  "model": {
+    "header": {
+      "title": "⚙️ 모델 정보",
+      "description": "모델에 대한 설명과 모델링 과정의 시각화 정보가 표시됩니다."
+    },
+    "info": "이곳에 모델 관련 상세 설명 및 시각화 데이터가 들어갈 예정입니다."
+  },
+  "charts": {
+    "trend_section": {
+      "title": "Active User Growth Trend",
+      "icon": "show_chart"
+    }
+  }
+}

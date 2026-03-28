@@ -23,13 +23,13 @@ def inject_custom_css():
     <style>
     {common_css}
     
-    /* --- Sidebar Styles --- */
+    /* --- 사이드바 스타일 --- */
     {sidebar_css}
     
-    /* --- Metrics Styles --- */
+    /* --- 지표 스타일 --- */
     {metrics_css}
     
-    /* --- Charts Styles --- */
+    /* --- 차트 스타일 --- */
     {charts_css}
     </style>
     """

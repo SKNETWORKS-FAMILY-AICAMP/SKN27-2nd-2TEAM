@@ -5,7 +5,7 @@ def get_charts_css():
     차트 영역(charts) 컴포넌트에만 적용되는 CSS 스타일을 반환합니다.
     """
     return textwrap.dedent("""
-        /* Chart Section Header */
+        /* 차트 섹션 헤더 */
         .chart-header {
             display: flex;
             align-items: center;
@@ -41,7 +41,7 @@ def get_charts_css():
             margin: 0;
         }
         
-        /* Utility */
+        /* 유틸리티 */
         .h-full {
             height: 100%;
         }

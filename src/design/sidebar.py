@@ -5,11 +5,11 @@ def get_sidebar_css():
     사이드바 컴포넌트에만 적용되는 CSS 스타일을 반환합니다.
     """
     return textwrap.dedent("""
-        /* Keep sidebar visible and expanded */
+        /* 사이드바가 항상 보이고 확장된 상태 유지 */
         [data-testid="stSidebar"] {
             background-color: #f8fafc !important; /* slate-100 */
         }
-        /* Keep sidebar visible, only hide the nav links */
+        /* 사이드바는 보이게 하되 내비게이션 링크만 숨김 */
         [data-testid="stSidebarNav"] {
             display: none !important;
         }
@@ -46,7 +46,7 @@ def get_sidebar_css():
         div.stRadio > div[role="radiogroup"] span[data-baseweb="radio"] div:first-child {
             display: none !important;
         }
-        /* Sidebar Header */
+        /* 사이드바 헤더 */
         .sidebar-header {
             padding: 1rem 0 2.5rem 0;
         }
@@ -66,7 +66,7 @@ def get_sidebar_css():
             margin: 0;
         }
         
-        /* Sidebar Spacer */
+        /* 사이드바 여백 */
         .sidebar-spacer {
             flex-grow: 1;
             height: 30vh;

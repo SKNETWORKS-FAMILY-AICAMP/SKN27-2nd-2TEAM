@@ -1,42 +1,41 @@
 import streamlit as st
 import textwrap
+from src.utils.data_loader import load_ui_config
 
 def render_sidebar():
     """
     사이드바 메뉴와 하단 프로필을 렌더링합니다.
     Streamlit의 st.sidebar 컨텍스트 내에서 호출되어야 합니다.
     """
-    # Header
+    ui_config = load_ui_config()
+    sidebar_config = ui_config["sidebar"]
+
+    # 헤더
     st.sidebar.html(
-        """
+        f"""
         <div class="sidebar-header">
-            <h1 class="sidebar-title">Analytics Pro</h1>
-            <p class="sidebar-subtitle">Precision Curator</p>
+            <h1 class="sidebar-title">{sidebar_config['title']}</h1>
+            <p class="sidebar-subtitle">{sidebar_config['subtitle']}</p>
         </div>
         """
     )
 
-    # Session state 초기화
+    # 세션 상태 초기화
     if "current_page" not in st.session_state:
         st.session_state.current_page = "Home"
 
-    # Navigation menu
-    menu_options = ["Home", "Customer Analysis", "Model"]
-    # Add icons to the labels just for display
-    menu_labels = {
-        "Home": "🏠 Home",
-        "Customer Analysis": "📉 고객 분석",
-        "Model": "⚙️ 모델 정보"
-    }
+    # 내비게이션 메뉴
+    menu_options = list(sidebar_config["menu"].keys())
+    menu_labels = sidebar_config["menu"]
     
-    # We create a reversed mapping to get the original option name
+    # 원래 옵션 이름을 얻기 위해 역방향 매핑 생성
     display_options = [menu_labels[opt] for opt in menu_options]
     
-    # Find current index to set the initial state if not present
+    # 현재 인덱스를 찾아 초기 상태 설정 (없는 경우)
     current_idx = menu_options.index(st.session_state.current_page)
     initial_display = display_options[current_idx]
 
-    # Initialize nav_radio in session state if it doesn't exist
+    # 세션 상태에 nav_radio가 없으면 초기화
     if "nav_radio" not in st.session_state:
         st.session_state.nav_radio = initial_display
 
