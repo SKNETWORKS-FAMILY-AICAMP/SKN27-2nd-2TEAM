@@ -12,7 +12,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, r2_score, confusion_matrix, classification_report
 
 # 실행 함수 
-def model_netflex():
+def simul_netflex():
 
     # 1. 데이터 로드 #########################################################################################
 
@@ -68,9 +68,10 @@ def model_netflex():
 
     # 5. 모델 학습 (train 데이터 fit) #########################################################################################
 
-    # 모델 생성 -> 학습 (현재는 decision tree 모델 )
-    model = DecisionTreeClassifier()
-    model.fit(train, y_train) # 모델 학습 // train == 처리 후 X_train
+    # 저장했던 모델 로드 (모델 학습 시에는 모델 선언 / 학습 하는 과정이 있었음 )
+
+    model = joblib.load('models/model_netflex.pkl')
+
 
     # 6. 모델 예측 (test 데이터 pred) #########################################################################################
     
@@ -84,8 +85,7 @@ def model_netflex():
 
     # 7. 모델/결과 저장 #########################################################################################
 
-    # 학습한 모델 저장
-    joblib.dump(model, 'models/model_netflex.pkl') # 폴더 구조 다르니까 파일 경로 수정해야 함 
+    # 저장한 모델을 사용하는거니 다시 저장안함 
     
     # 8. 결과 표시 / 시각화 #########################################################################################
 
@@ -126,4 +126,4 @@ def model_netflex():
 
 
 if __name__ == '__main__':
-    model_netflex()
+    simul_netflex()
