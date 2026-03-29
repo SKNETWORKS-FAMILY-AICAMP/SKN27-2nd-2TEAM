@@ -2,7 +2,7 @@
 앱에서 쓰는 JSON/CSV 파일 로드 및 Streamlit 캐시(`@st.cache_data`).
 
 - 경로 상수는 `src.config.config` 참조
-- UI 문자열: `ui_config.json`, 지표/차트/시뮬레이터/하단모듈: `data/sample/` 하위 파일
+- UI 문자열·하단 모듈: `src/config/` JSON, 지표/차트/시뮬레이터: `data/sample/` CSV
 """
 import json
 import pandas as pd

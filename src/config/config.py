@@ -12,7 +12,7 @@ UI_CONFIG_PATH = BASE_DIR / "src" / "config" / "ui_config.json"
 METRICS_DATA_PATH = BASE_DIR / "data" / "sample" / "dashboard_metrics.csv"
 CHART_DATA_PATH = BASE_DIR / "data" / "sample" / "chart_data.csv"
 SIMULATOR_DATA_PATH = BASE_DIR / "data" / "sample" / "simulator_sample.csv"
-DASHBOARD_MODULES_DATA_PATH = BASE_DIR / "data" / "sample" / "dashboard_modules.json"
+DASHBOARD_MODULES_DATA_PATH = BASE_DIR / "src" / "config" / "dashboard_modules.json"
 
 # 모델 및 전처리 파일 경로
 MODEL_PATH = BASE_DIR / "models" / "model.pkl"
