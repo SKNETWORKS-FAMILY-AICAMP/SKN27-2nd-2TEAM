@@ -1,3 +1,9 @@
+# front 구현 라이브러리
 streamlit==1.55.0
 pandas==2.3.3
 numpy==2.4.3
+
+# 모델 학습용 라이브러리
+scikit-learn==1.8.0
+matplotlib==3.10.8
+seaborn==0.13.2

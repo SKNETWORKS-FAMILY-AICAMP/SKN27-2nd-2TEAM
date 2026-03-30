@@ -1,0 +1,5 @@
+segment_name,base_churn_prob,subscription_type,monthly_revenue,viewing_hours,customer_support_calls
+신규 가입자 (1개월 미만),18.0,Basic,9.99,15.0,2
+일반 사용자 (Standard),15.5,Standard,15.99,35.5,1
+충성 고객 (Premium),5.0,Premium,22.99,60.0,0
+위험군 (문의 다수),35.0,Standard,15.99,20.0,5
