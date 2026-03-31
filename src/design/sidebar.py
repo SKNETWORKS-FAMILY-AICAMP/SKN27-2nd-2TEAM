@@ -5,7 +5,10 @@ def _css_sidebar_shell() -> str:
     """사이드바 패널 배경 및 Streamlit 기본 네비 숨김."""
     return f"""
         [data-testid="stSidebar"] {{
-            background-color: {COLORS["background"]} !important;
+            background-color: #475569 !important;
+        }}
+        [data-testid="stSidebar"] > div:first-child {{
+            background-color: #475569 !important;
         }}
         [data-testid="stSidebarNav"] {{
             display: none !important;
@@ -24,20 +27,20 @@ def _css_sidebar_nav() -> str:
             background-color: transparent;
         }}
         div.stRadio > div[role="radiogroup"] > label:hover {{
-            background-color: rgba(226, 232, 240, 0.5) !important;
+            background-color: rgba(226, 232, 240, 0.16) !important;
         }}
         div.stRadio > div[role="radiogroup"] > label[data-checked="true"] {{
-            background-color: rgba(226, 232, 240, 0.5) !important;
-            border-left: 4px solid {COLORS["primary_dark"]} !important;
+            background-color: rgba(226, 232, 240, 0.24) !important;
+            border-left: 4px solid #f87171 !important;
             border-radius: 0 0.375rem 0.375rem 0 !important;
         }}
         div.stRadio > div[role="radiogroup"] > label[data-checked="true"] p {{
-            color: {COLORS["primary_dark"]} !important;
+            color: #f8fafc !important;
             font-weight: 700 !important;
         }}
         div.stRadio p {{
             font-size: 0.875rem !important;
-            color: #475569 !important;
+            color: #e2e8f0 !important;
             font-weight: 500 !important;
             letter-spacing: -0.025em !important;
         }}
@@ -54,12 +57,12 @@ def _css_sidebar_header() -> str:
         .sidebar-title {{
             font-size: 1.25rem;
             font-weight: 900;
-            color: {COLORS["text_main"]};
+            color: #f8fafc;
             margin: 0;
         }}
         .sidebar-subtitle {{
             font-size: 0.75rem;
-            color: {COLORS["text_muted"]};
+            color: #cbd5e1;
             font-weight: 500;
             letter-spacing: -0.025em;
             margin: 0;
