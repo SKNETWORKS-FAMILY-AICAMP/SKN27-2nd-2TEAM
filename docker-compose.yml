@@ -1,29 +1,35 @@
-version: '3.8'
+version: "3.8"
 
 services:
   db:
     image: mysql:8.0
-    container_name: stitch_mysql
+    container_name: netflix_db
     ports:
       - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: stitch_db
+      MYSQL_DATABASE: ${DB_NAME}
     volumes:
-      - ./backend/db_init:/docker-entrypoint-initdb.d
       - db_data:/var/lib/mysql
-
-  data_pipeline:
-    build:
-      context: ./backend
-    container_name: stitch_pipeline
-    depends_on:
-      - db
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+  backend:
+    build: ./backend
+    container_name: netflix_data_pipeline
     volumes:
-      # 로컬의 data/server 폴더와 컨테이너 내부를 연결하여 CSV 파일 공유
-      - ./data/server:/app/data/server
-    env_file:
-      - .env
+      - ./backend:/app
+    working_dir: /app
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: netflix_db
+      DB_USER: root
+      DB_PASSWORD: password
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   db_data:
