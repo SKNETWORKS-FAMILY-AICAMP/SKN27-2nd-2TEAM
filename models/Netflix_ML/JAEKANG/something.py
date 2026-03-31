@@ -313,6 +313,8 @@ class NetflixFeatureBuilder:
         return self
 
     def add_last_activity_date(self):
+
+
         # -------------------------------------------------
         # last_activity_date / days_since_last_activity 만들기
         # 정의:
@@ -401,6 +403,71 @@ class NetflixFeatureBuilder:
         self.new_user['last_activity_date'] = self.new_user['last_activity_date'].dt.date
 
         return self
+
+    def add_last_activity_date(self):
+        # -------------------------------------------------
+        # 날짜 컬럼 4개 만들기
+        # - last_watch_date
+        # - last_search_date
+        # - last_review_date
+        # - last_activity_date = 위 3개 중 가장 최근 날짜
+        # recommendation 날짜는 제외
+        # -------------------------------------------------
+
+        # 1. watch 마지막 날짜
+        watch_tmp = self.watch[['user_id', 'watch_date']].copy()
+        watch_tmp['watch_date'] = pd.to_datetime(watch_tmp['watch_date'], errors='coerce')
+
+        last_watch_date_map = (
+            watch_tmp.groupby('user_id')['watch_date']
+            .max()
+            .to_dict()
+        )
+
+        # 2. search 마지막 날짜
+        search_tmp = self.search_logs[['user_id', 'search_date']].copy()
+        search_tmp['search_date'] = pd.to_datetime(search_tmp['search_date'], errors='coerce')
+
+        last_search_date_map = (
+            search_tmp.groupby('user_id')['search_date']
+            .max()
+            .to_dict()
+        )
+
+        # 3. review 마지막 날짜
+        review_tmp = self.reviews[['user_id', 'review_date']].copy()
+        review_tmp['review_date'] = pd.to_datetime(review_tmp['review_date'], errors='coerce')
+
+        last_review_date_map = (
+            review_tmp.groupby('user_id')['review_date']
+            .max()
+            .to_dict()
+        )
+
+        # 4. new_user에 각 날짜 컬럼 추가
+        self.new_user['last_watch_date'] = self.new_user['user_id'].map(last_watch_date_map)
+        self.new_user['last_search_date'] = self.new_user['user_id'].map(last_search_date_map)
+        self.new_user['last_review_date'] = self.new_user['user_id'].map(last_review_date_map)
+
+        # 5. datetime 형식 통일
+        date_cols = [
+            'last_watch_date',
+            'last_search_date',
+            'last_review_date'
+        ]
+
+        for col in date_cols:
+            self.new_user[col] = pd.to_datetime(self.new_user[col], errors='coerce')
+
+        # 6. 마지막 활동일 = 위 3개 날짜 중 최대값
+        self.new_user['last_activity_date'] = self.new_user[date_cols].max(axis=1)
+
+        # 7. 보기 좋게 날짜만 남기기
+        for col in date_cols + ['last_activity_date']:
+            self.new_user[col] = self.new_user[col].dt.date
+
+        return self
+
 
     def get_data(self):
         return self.new_user.copy()
