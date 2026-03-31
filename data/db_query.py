@@ -22,6 +22,21 @@ if os.path.exists(env_path):
                 key, value = line.strip().split('=', 1)
                 os.environ[key] = value
 
-query = "SELECT * FROM users"
-print(get_data_from_db(query))
+queries = {
+    "movies": "SELECT * FROM movies",
+    "recommendation_logs": "SELECT * FROM recommendation_logs",
+    "reviews": "SELECT * FROM reviews",
+    "search_logs": "SELECT * FROM search_logs",
+    "watch_history": "SELECT * FROM watch_history",
+    "users": "SELECT * FROM users",
+}
+
+server_dir = os.path.join(current_dir, "server")
+os.makedirs(server_dir, exist_ok=True)
+
+for table_name, query in queries.items():
+    df = get_data_from_db(query)
+    output_path = os.path.join(server_dir, f"{table_name}.csv")
+    df.to_csv(output_path, index=False, encoding="utf-8-sig")
+    print(f"### {table_name} 테이블 다운 완료")
 
