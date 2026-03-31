@@ -5,7 +5,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # 데이터 파일 경로
 DATA_SAMPLE_PATH = BASE_DIR / "data" / "sample" / "sample_segment.csv"
-DATA_SERVER_PATH = BASE_DIR / "data" / "server" / "segment_output.csv"
 
 # UI 및 대시보드 데이터 경로
 UI_CONFIG_PATH = BASE_DIR / "src" / "config" / "ui_config.json"
