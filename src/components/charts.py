@@ -14,6 +14,7 @@ def render_main_trend_chart():
     """
     데이터 로더를 통해 로드된 데이터로 트렌드 차트를 그립니다.
     """
+    # 차트 제목/아이콘/높이는 ui_config를 단일 소스로 사용합니다.
     ui_config = load_ui_config()
     chart_config = ui_config["charts"]["trend_section"]
 
@@ -21,13 +22,14 @@ def render_main_trend_chart():
         markup.chart_trend_header(chart_config["icon"], chart_config["title"])
     )
 
+    # chart_data.csv에서 주차별 active_users 시계열을 읽어 바로 렌더링합니다.
     df = load_chart_data()
     st.line_chart(
         df,
         x="week",
         y="active_users",
         color=COLORS["primary"],
-        height=320,
+        height=int(chart_config["height"]),
     )
 
 

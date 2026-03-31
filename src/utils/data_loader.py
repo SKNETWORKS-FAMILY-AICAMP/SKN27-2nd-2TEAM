@@ -13,6 +13,7 @@ from src.config.config import (
     KPI_SOURCE_DATA_PATH,
     KPI_TARGET_MONTH_DAY,
     KPI_DELTA_DAYS,
+    KPI_INACTIVE_DAYS_THRESHOLD,
     CHART_DATA_PATH,
     SIMULATOR_DATA_PATH,
     DASHBOARD_MODULES_DATA_PATH,
@@ -27,59 +28,81 @@ def load_ui_config():
 @st.cache_data
 def load_metrics_data():
     """홈 KPI 4종(활성 사용자/평균 시청시간/이탈률/평균 미접속일)을 계산해 반환합니다."""
+    # KPI 계산의 원천 데이터(사용자 단위 샘플).
     df = pd.read_csv(KPI_SOURCE_DATA_PATH)
+    # 카드 제목/아이콘/포맷/증감 해석 규칙 정의.
+    kpi_defs = _load_dashboard_kpi_defs()
 
+    # 기준일(예: 12-25)과 비교 기준일(기준일 - 7일).
     target_date = _build_target_date(KPI_TARGET_MONTH_DAY)
     previous_date = target_date - timedelta(days=KPI_DELTA_DAYS)
 
+    # 두 시점의 스냅샷을 같은 규칙으로 계산한 뒤 카드로 조립.
     current = _compute_snapshot_metrics(df, target_date)
     previous = _compute_snapshot_metrics(df, previous_date)
+    return _build_dashboard_kpi_records(current, previous, kpi_defs)
 
-    return [
-        _build_metric_record(
-            icon_name="group",
-            icon_style_class="primary",
-            title="전체 사용자 수",
-            value_text=_format_count(current["active_users"]),
-            change_text=_format_delta_percent(current["active_users"], previous["active_users"]),
-            is_positive=current["active_users"] >= previous["active_users"],
-            emoji="",
-        ),
-        _build_metric_record(
-            icon_name="schedule",
-            icon_style_class="secondary",
-            title="평균 시청시간",
-            value_text=_format_float_with_unit(current["avg_watch_time"], "분"),
-            change_text=_format_delta_percent(current["avg_watch_time"], previous["avg_watch_time"]),
-            is_positive=current["avg_watch_time"] >= previous["avg_watch_time"],
-            emoji="",
-        ),
-        _build_metric_record(
-            icon_name="how_to_reg",
-            icon_style_class="tertiary",
-            title="활성 유저 비율",
-            value_text=_format_percent(_active_rate_from_churn(current["churn_rate"])),
-            change_text=_invert_delta_sign(
-                _format_delta_percent(current["churn_rate"], previous["churn_rate"])
-            ),
-            is_positive=_active_rate_from_churn(current["churn_rate"])
-            >= _active_rate_from_churn(previous["churn_rate"]),
-            emoji="",
-        ),
-        _build_metric_record(
-            icon_name="event_busy",
-            icon_style_class="orange",
-            title="평균 미접속 기간",
-            value_text=_format_float_with_unit(current["avg_days_since_login"], "일"),
-            change_text=_format_delta_percent(
-                current["avg_days_since_login"],
-                previous["avg_days_since_login"],
-            ),
-            # 미접속 기간은 증가할수록 부정적이므로 색상 기준을 반대로 적용.
-            is_positive=current["avg_days_since_login"] < previous["avg_days_since_login"],
-            emoji="",
-        ),
-    ]
+
+def _load_dashboard_kpi_defs() -> list[dict]:
+    """대시보드 KPI 카드 메타 설정을 ui_config에서 읽습니다."""
+    ui_cfg = load_ui_config()
+    return ui_cfg["dashboard"]["kpi_cards"]
+
+
+def _build_dashboard_kpi_records(current: dict, previous: dict, kpi_defs: list[dict]) -> list[dict]:
+    """현재/비교 스냅샷과 카드 정의를 결합해 렌더링용 레코드 리스트를 만듭니다."""
+    records = []
+    for card in kpi_defs:
+        # delta_source: 이 카드가 참조할 스냅샷 키(예: churn_rate, active_users).
+        metric_key = card["delta_source"]
+        current_metric = _resolve_metric_value(current, metric_key, card["value_format"])
+        previous_metric = _resolve_metric_value(previous, metric_key, card["value_format"])
+        records.append(
+            _build_metric_record(
+                icon_name=card["icon_name"],
+                icon_style_class=card["icon_style_class"],
+                title=card["title"],
+                value_text=_format_metric_value(current_metric, card),
+                change_text=_format_metric_delta(current_metric, previous_metric, card),
+                is_positive=_is_positive_delta(current_metric, previous_metric, card),
+                emoji=card.get("emoji", ""),
+            )
+        )
+    return records
+
+
+def _resolve_metric_value(snapshot: dict, metric_key: str, value_format: str) -> float:
+    """스냅샷 값에서 카드 표시용 원시값을 계산합니다."""
+    metric_value = float(snapshot.get(metric_key, 0.0))
+    # 활성 유저 비율 카드는 churn_rate를 100-값으로 변환해 사용.
+    if value_format == "percent_from_churn":
+        return _active_rate_from_churn(metric_value)
+    return metric_value
+
+
+def _format_metric_value(value: float, card_cfg: dict) -> str:
+    """카드 설정에 맞게 숫자 포맷(count/percent/float)을 적용합니다."""
+    value_format = card_cfg["value_format"]
+    if value_format == "count":
+        return _format_count(value)
+    if value_format == "percent" or value_format == "percent_from_churn":
+        return _format_percent(value)
+    if value_format == "float":
+        return _format_float_with_unit(value, card_cfg.get("value_unit", ""))
+    return str(value)
+
+
+def _format_metric_delta(current: float, previous: float, card_cfg: dict) -> str:
+    """증감 포맷 규칙(percent_change / inverse_percent_change)을 적용합니다."""
+    delta_format = card_cfg["delta_format"]
+    delta = _format_delta_percent(current, previous)
+    return _invert_delta_sign(delta) if delta_format == "inverse_percent_change" else delta
+
+
+def _is_positive_delta(current: float, previous: float, card_cfg: dict) -> bool:
+    """카드별 증감 의미(up/down)에 따라 positive 여부를 계산합니다."""
+    direction = card_cfg.get("is_positive_when", "up")
+    return current >= previous if direction == "up" else current < previous
 
 
 def _build_target_date(month_day_text: str) -> date:
@@ -91,6 +114,7 @@ def _build_target_date(month_day_text: str) -> date:
 def _compute_snapshot_metrics(df: pd.DataFrame, as_of_date: date) -> dict:
     """특정 기준일의 KPI 스냅샷(4종 원시 수치)을 계산합니다."""
     target_date = _build_target_date(KPI_TARGET_MONTH_DAY)
+    # 기준일 대비 과거 시점 보정치(일). 과거일수록 허용 임계값을 완화.
     day_shift = max((target_date - as_of_date).days, 0)
 
     churned_series = (
@@ -103,9 +127,11 @@ def _compute_snapshot_metrics(df: pd.DataFrame, as_of_date: date) -> dict:
 
     days_since_raw = pd.to_numeric(df.get("days_since_last_login"), errors="coerce")
     days_since_clean = days_since_raw.clip(lower=0)
-    inactivity_churned = days_since_clean > (30 + day_shift)
+    # 기준일 기준 비활성 임계치(기본 30일)에 시점 보정치를 더해 이탈 판정.
+    inactivity_churned = days_since_clean > (KPI_INACTIVE_DAYS_THRESHOLD + day_shift)
     is_churned = (churned_yes | inactivity_churned.fillna(False)).fillna(False)
 
+    # 활성 유저: 이탈이 아닌 사용자.
     active_mask = ~is_churned
     active_users = int(active_mask.sum())
 
@@ -113,8 +139,10 @@ def _compute_snapshot_metrics(df: pd.DataFrame, as_of_date: date) -> dict:
     avg_watch_time = watch_time[active_mask].mean()
 
     valid_rows = int(is_churned.shape[0])
+    # 이탈률(%): 이탈 사용자 비율.
     churn_rate = (float(is_churned.sum()) / valid_rows * 100.0) if valid_rows else 0.0
 
+    # 평균 미접속 기간은 시점 보정치만큼 역산해 계산.
     as_of_days_since = (days_since_clean - day_shift).clip(lower=0)
     avg_days_since_login = as_of_days_since.mean()
 
@@ -172,6 +200,7 @@ def _build_metric_record(
     is_positive: bool,
     emoji: str,
 ) -> dict:
+    """KPI 카드 렌더링 공통 스키마(dict)를 생성합니다."""
     return {
         "icon_name": icon_name,
         "icon_style_class": icon_style_class,
@@ -184,6 +213,7 @@ def _build_metric_record(
 
 
 def _nan_to_zero(value) -> float:
+    """NaN/None 형태 값을 안전하게 0.0으로 치환합니다."""
     if pd.isna(value):
         return 0.0
     return float(value)

@@ -18,6 +18,7 @@ DASHBOARD_MODULES_DATA_PATH = BASE_DIR / "src" / "config" / "dashboard_modules.j
 # KPI 증감 계산 기준 설정
 KPI_TARGET_MONTH_DAY = "12-25"
 KPI_DELTA_DAYS = 7
+KPI_INACTIVE_DAYS_THRESHOLD = 30
 
 # 모델 및 전처리 파일 경로
 MODEL_PATH = BASE_DIR / "models" / "model.pkl"
