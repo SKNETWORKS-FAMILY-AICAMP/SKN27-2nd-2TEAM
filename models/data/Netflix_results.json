@@ -3,5 +3,6 @@
     "loss": 0.2189,
     "precision": 0.2276,
     "recall": 0.2,
-    "f1_score": 0.2129
+    "f1_score": 0.2129,
+    "auc_te": 0.541
 }
