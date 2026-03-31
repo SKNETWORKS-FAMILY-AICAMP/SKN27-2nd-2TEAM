@@ -468,6 +468,66 @@ class NetflixFeatureBuilder:
 
         return self
 
+    def add_estimated_churn_date_p90(self, p90_days=124):
+        # -------------------------------------------------
+        # p90 기반 추정 이탈일 + 검증 컬럼 만들기
+        #
+        # 전제:
+        # self.new_user 에 아래 컬럼이 이미 있어야 함
+        # - last_watch_date
+        # - last_search_date
+        # - last_review_date
+        # - last_activity_date
+        #
+        # 생성 컬럼:
+        # 1. estimated_churn_date_p90
+        # 2. is_p90_estimate_valid
+        #    True  = 추정이 상대적으로 타당
+        #    False = 추정이 너무 빠름
+        # -------------------------------------------------
+
+        required_cols = [
+            'last_watch_date',
+            'last_search_date',
+            'last_review_date',
+            'last_activity_date'
+        ]
+
+        for col in required_cols:
+            if col not in self.new_user.columns:
+                raise ValueError(f"'{col}' 컬럼이 없습니다. 먼저 add_last_activity_date()를 실행하세요.")
+
+        # 1. 날짜형 변환
+        for col in required_cols:
+            self.new_user[col] = pd.to_datetime(self.new_user[col], errors='coerce')
+
+        # 2. 핵심 활동일 = watch + search 중 최대
+        self.new_user['last_core_activity_date'] = self.new_user[
+            ['last_watch_date', 'last_search_date']
+        ].max(axis=1)
+
+        # 3. p90 기반 추정 이탈일
+        self.new_user['estimated_churn_date_p90'] = (
+            self.new_user['last_core_activity_date'] + pd.to_timedelta(p90_days, unit='D')
+        )
+
+        # 4. 추정 타당성 검증
+        # True  = last_activity_date가 p90 추정일을 넘지 않음 -> 추정이 상대적으로 타당
+        # False = last_activity_date가 p90 추정일 이후에도 있음 -> 추정이 너무 빠름
+        self.new_user['is_p90_estimate_valid'] = (
+            self.new_user['last_activity_date'] <= self.new_user['estimated_churn_date_p90']
+        )
+
+        # 5. 보기 좋게 date만 남기기
+        date_cols = [
+            'last_core_activity_date',
+            'estimated_churn_date_p90'
+        ]
+
+        for col in date_cols:
+            self.new_user[col] = self.new_user[col].dt.date
+
+        return self
 
     def get_data(self):
         return self.new_user.copy()
