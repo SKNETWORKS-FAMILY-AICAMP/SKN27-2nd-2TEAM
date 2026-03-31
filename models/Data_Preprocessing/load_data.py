@@ -8,7 +8,7 @@ reset_seeds(42)
 # ─────────────────────────────────────────
 # 1. 경로 설정
 # ─────────────────────────────────────────
-def get_args(default_path: str = 'C:/dev/project/mini_project/SKN27-2nd-2TEAM/models/data/') -> easydict.EasyDict:
+def get_args(default_path: str = 'C:/dev/project/SKN27-2nd-2TEAM/models/data/') -> easydict.EasyDict:
     """경로 및 파일 설정을 담은 EasyDict 반환"""
     args = easydict.EasyDict()
     args.default_path = default_path
