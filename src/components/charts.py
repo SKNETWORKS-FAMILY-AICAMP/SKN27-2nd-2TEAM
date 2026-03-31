@@ -22,7 +22,7 @@ def render_main_trend_chart():
     )
 
     df = load_chart_data()
-    st.area_chart(
+    st.line_chart(
         df,
         x="week",
         y="active_users",

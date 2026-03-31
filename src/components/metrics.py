@@ -1,7 +1,7 @@
 """
 대시보드 상단 KPI 카드 행.
 
-- `dashboard_metrics.csv`를 로드해 4개 카드를 가로로 배치
+- `netflix_user_sample.csv` 기반 집계 결과를 로드해 4개 카드를 가로로 배치
 - `markup.metric_card_html` + 디자인 시스템의 `.metric-card` 스타일 사용
 """
 import streamlit as st
