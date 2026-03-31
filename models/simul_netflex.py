@@ -11,8 +11,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, r2_score, confusion_matrix, classification_report
 
-# 실행 함수 
-def simul_netflex():
+# 실행 함수
+def simul_netflix():
 
     # 1. 데이터 로드 #########################################################################################
 
@@ -70,7 +70,7 @@ def simul_netflex():
 
     # 저장했던 모델 로드 (모델 학습 시에는 모델 선언 / 학습 하는 과정이 있었음 )
 
-    model = joblib.load('models/model_netflex.pkl')
+    model = joblib.load('models/model_netflix.pkl')
 
 
     # 6. 모델 예측 (test 데이터 pred) #########################################################################################
@@ -126,4 +126,4 @@ def simul_netflex():
 
 
 if __name__ == '__main__':
-    simul_netflex()
+    simul_netflix()

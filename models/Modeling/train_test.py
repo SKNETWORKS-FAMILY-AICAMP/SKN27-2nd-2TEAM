@@ -59,13 +59,14 @@ def predict_churners(enc_te: pd.DataFrame,
                     y_prob: pd.Series, y_pred: pd.Series) -> pd.DataFrame:
     """이탈 예측 결과 DataFrame 생성 및 반환"""
 
-    result_Netflix = enc_te.copy()
-    result_Netflix['churn_probability'] = y_prob
-    result_Netflix['predicted_churn']   = y_pred
+    # 테스트 인코딩 결과에 확률/예측값을 붙여 추적 가능한 결과셋을 만든다.
+    result_netflix = enc_te.copy()
+    result_netflix['churn_probability'] = y_prob
+    result_netflix['predicted_churn']   = y_pred
 
-    predicted_churners = result_Netflix[result_Netflix['predicted_churn'] == 1]
+    predicted_churners = result_netflix[result_netflix['predicted_churn'] == 1]
 
-    print(f"전체 테스트 회원 수       : {len(result_Netflix)}명")
+    print(f"전체 테스트 회원 수       : {len(result_netflix)}명")
     print(f"모델이 예측한 이탈 회원 수 : {len(predicted_churners)}명")
     display(predicted_churners.head())
 

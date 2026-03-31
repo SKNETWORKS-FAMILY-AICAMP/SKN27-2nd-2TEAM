@@ -22,9 +22,8 @@ def save_train_test(args, X_tr: pd.DataFrame, X_te: pd.DataFrame) -> None:
 def save_submission(args, X_te: pd.DataFrame,
                     model, enc_te: pd.DataFrame) -> pd.DataFrame:
     """제출용 CSV 생성 및 저장"""
+    # 내부 split 결과(X_te)에서 user_id를 꺼내 예측 결과와 함께 저장한다.
     submission_Netflix = X_te[['user_id']].copy()
-    submission_Netflix['is_churned'] = 0
-    submission_Netflix.to_csv(args.default_submission_csv, index=False)
     submission_Netflix['is_churned'] = model.predict(enc_te)
     submission_Netflix.to_csv(args.default_submission_csv, index=False)
     print(f'제출 파일 저장 완료: {args.default_submission_csv}')
@@ -40,9 +39,10 @@ def save_results(args, y_te: pd.Series, y_pred: pd.Series, auc_te: float) -> dic
     results = {
         "accuracy" : accuracy,
         "loss"     : round(1 - accuracy, 4),
-        "precision": round(precision_score(y_te, y_pred), 4),
-        "recall"   : round(recall_score(y_te, y_pred), 4),
-        "f1_score" : round(f1_score(y_te, y_pred), 4),
+        # 불균형/극단 예측 케이스에서도 예외 없이 지표를 계산한다.
+        "precision": round(precision_score(y_te, y_pred, zero_division=0), 4),
+        "recall"   : round(recall_score(y_te, y_pred, zero_division=0), 4),
+        "f1_score" : round(f1_score(y_te, y_pred, zero_division=0), 4),
         "auc_te"   : round(auc_te, 4)
     }
     args.results.append(results)
@@ -58,14 +58,19 @@ def save_results(args, y_te: pd.Series, y_pred: pd.Series, auc_te: float) -> dic
 # ─────────────────────────────────────────
 def save_model(args, model) -> None:
     """학습한 모델을 pkl 파일로 저장"""
-    save_path = args.default_path + '../model_Netflex.pkl'
-    old_path  = args.default_path + '../model_netflex.pkl'
+    # 오타(Netflex) 파일은 정리하고 Netflix 파일명으로 단일 저장한다.
+    save_path = args.default_path + '../model_netflix.pkl'
+    legacy_paths = [
+        args.default_path + '../model_Netflex.pkl',
+        args.default_path + '../model_netflex.pkl',
+    ]
 
     print(f'저장 시도 경로: {save_path}') 
 
-    if os.path.exists(old_path):
-        os.remove(old_path)
-        print(f'기존 파일 삭제: {old_path}')
+    for old_path in legacy_paths:
+        if os.path.exists(old_path):
+            os.remove(old_path)
+            print(f'기존 파일 삭제: {old_path}')
 
     joblib.dump(model, save_path)
     print(f'모델 저장 완료: {save_path}')
@@ -76,6 +81,10 @@ def save_model(args, model) -> None:
 # ─────────────────────────────────────────
 def summarize_results(args) -> pd.DataFrame:
     """args.results를 AUC 기준 정렬하여 반환"""
+    if not args.results:
+        print('요약할 결과가 없습니다.')
+        return pd.DataFrame()
+
     Netflix_results = pd.DataFrame(args.results).sort_values(
         by=['auc_te'], ascending=False
     )
