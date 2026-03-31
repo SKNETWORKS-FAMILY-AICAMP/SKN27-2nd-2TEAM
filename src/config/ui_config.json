@@ -68,9 +68,10 @@
   },
   "charts": {
     "trend_section": {
-      "title": "Active User Growth Trend",
-      "icon": "show_chart",
-      "height": 320
+      "title": "연령대별 활성 구독자 수 증감 비교",
+      "icon": "bar_chart_4_bars",
+      "height": 320,
+      "caption": "설정된 기준일과 비교일(기준일-7일)의 연령대별 활성 유저 수를 비교합니다."
     }
   },
   "analysis": {

@@ -11,10 +11,9 @@ import streamlit as st
 from src.config.config import (
     UI_CONFIG_PATH,
     KPI_SOURCE_DATA_PATH,
-    KPI_TARGET_MONTH_DAY,
-    KPI_DELTA_DAYS,
-    KPI_INACTIVE_DAYS_THRESHOLD,
-    CHART_DATA_PATH,
+    SNAPSHOT_TARGET_MONTH_DAY,
+    SNAPSHOT_DELTA_DAYS,
+    INACTIVE_DAYS_THRESHOLD,
     SIMULATOR_DATA_PATH,
     DASHBOARD_MODULES_DATA_PATH,
 )
@@ -34,8 +33,8 @@ def load_metrics_data():
     kpi_defs = _load_dashboard_kpi_defs()
 
     # 기준일(예: 12-25)과 비교 기준일(기준일 - 7일).
-    target_date = _build_target_date(KPI_TARGET_MONTH_DAY)
-    previous_date = target_date - timedelta(days=KPI_DELTA_DAYS)
+    target_date = _build_target_date(SNAPSHOT_TARGET_MONTH_DAY)
+    previous_date = target_date - timedelta(days=SNAPSHOT_DELTA_DAYS)
 
     # 두 시점의 스냅샷을 같은 규칙으로 계산한 뒤 카드로 조립.
     current = _compute_snapshot_metrics(df, target_date)
@@ -113,23 +112,14 @@ def _build_target_date(month_day_text: str) -> date:
 
 def _compute_snapshot_metrics(df: pd.DataFrame, as_of_date: date) -> dict:
     """특정 기준일의 KPI 스냅샷(4종 원시 수치)을 계산합니다."""
-    target_date = _build_target_date(KPI_TARGET_MONTH_DAY)
+    target_date = _build_target_date(SNAPSHOT_TARGET_MONTH_DAY)
     # 기준일 대비 과거 시점 보정치(일). 과거일수록 허용 임계값을 완화.
     day_shift = max((target_date - as_of_date).days, 0)
-
-    churned_series = (
-        df.get("churned", pd.Series(dtype=str))
-        .astype(str)
-        .str.strip()
-        .str.lower()
-    )
-    churned_yes = churned_series == "yes"
 
     days_since_raw = pd.to_numeric(df.get("days_since_last_login"), errors="coerce")
     days_since_clean = days_since_raw.clip(lower=0)
     # 기준일 기준 비활성 임계치(기본 30일)에 시점 보정치를 더해 이탈 판정.
-    inactivity_churned = days_since_clean > (KPI_INACTIVE_DAYS_THRESHOLD + day_shift)
-    is_churned = (churned_yes | inactivity_churned.fillna(False)).fillna(False)
+    is_churned = _compute_churn_mask(df, days_since_clean, day_shift=day_shift)
 
     # 활성 유저: 이탈이 아닌 사용자.
     active_mask = ~is_churned
@@ -176,6 +166,19 @@ def _format_delta_percent(current: float, previous: float) -> str:
     return f"{sign}{abs(delta):.1f}%"
 
 
+def _compute_churn_mask(df: pd.DataFrame, days_since_clean: pd.Series, *, day_shift: int) -> pd.Series:
+    """`churned` 라벨 + 미접속 임계치 기준으로 이탈 마스크를 계산합니다."""
+    churned_yes = (
+        df.get("churned", pd.Series(dtype=str))
+        .astype(str)
+        .str.strip()
+        .str.lower()
+        == "yes"
+    )
+    inactivity_churned = days_since_clean > (INACTIVE_DAYS_THRESHOLD + day_shift)
+    return (churned_yes | inactivity_churned.fillna(False)).fillna(False)
+
+
 def _active_rate_from_churn(churn_rate: float) -> float:
     """이탈률(%)을 활성 유저 비율(%)로 변환합니다."""
     return 100.0 - churn_rate
@@ -219,9 +222,64 @@ def _nan_to_zero(value) -> float:
     return float(value)
 
 @st.cache_data
-def load_chart_data():
-    """차트 데이터 CSV 파일을 로드합니다."""
-    return pd.read_csv(CHART_DATA_PATH)
+def load_age_active_histogram_data() -> pd.DataFrame:
+    """기준일/비교일의 연령대별 활성 유저 수 비교 DataFrame을 생성합니다."""
+    ui_config = load_ui_config()
+    trend_cfg = ui_config["charts"]["trend_section"]
+    target_date = _build_target_date(SNAPSHOT_TARGET_MONTH_DAY)
+    previous_date = target_date - timedelta(days=SNAPSHOT_DELTA_DAYS)
+    current_label = trend_cfg.get("current_label") or target_date.strftime("%m/%d")
+    previous_label = trend_cfg.get("previous_label") or previous_date.strftime("%m/%d")
+
+    df = pd.read_csv(KPI_SOURCE_DATA_PATH)
+    ages = pd.to_numeric(df.get("age"), errors="coerce")
+    valid_age = ages.notna() & (ages >= 0) & (ages <= 120)
+    filtered = df.loc[valid_age].copy()
+    filtered["age"] = ages.loc[valid_age].astype(int)
+    filtered["age_group"] = filtered["age"].map(_age_group_label)
+
+    current_shift = max((target_date - target_date).days, 0)
+    previous_shift = max((target_date - previous_date).days, 0)
+
+    days_since = pd.to_numeric(filtered.get("days_since_last_login"), errors="coerce").clip(lower=0)
+    current_active = ~_compute_churn_mask(filtered, days_since, day_shift=current_shift)
+    previous_active = ~_compute_churn_mask(filtered, days_since, day_shift=previous_shift)
+
+    current_counts = filtered.loc[current_active, "age_group"].value_counts()
+    previous_counts = filtered.loc[previous_active, "age_group"].value_counts()
+    all_groups = sorted(set(current_counts.index) | set(previous_counts.index), key=_age_group_sort_key)
+
+    return pd.DataFrame(
+        {
+            previous_label: [int(previous_counts.get(group, 0)) for group in all_groups],
+            current_label: [int(current_counts.get(group, 0)) for group in all_groups],
+        },
+        index=all_groups,
+    )
+
+
+def _age_group_label(age_value: int) -> str:
+    """나이를 홈 차트용 연령대 라벨로 변환합니다."""
+    age = int(age_value)
+    if age <= 19:
+        return "10대 이하"
+    if age >= 60:
+        return "60대 이상"
+    decade = (age // 10) * 10
+    return f"{decade}대"
+
+
+def _age_group_sort_key(label: str) -> int:
+    """연령대 라벨을 숫자 기준으로 정렬하기 위한 키."""
+    order = {
+        "10대 이하": 10,
+        "20대": 20,
+        "30대": 30,
+        "40대": 40,
+        "50대": 50,
+        "60대 이상": 60,
+    }
+    return order.get(str(label), 10_000)
 
 @st.cache_data
 def load_simulator_data():
