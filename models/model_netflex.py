@@ -6,124 +6,119 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import joblib
+import easydict
+import warnings
+import torch
+import random
+import os
+import warnings
+import joblib
 
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, r2_score, confusion_matrix, classification_report
+from Data_Preprocessing.load_data import get_args, load_data, preprocess_target
+from Data_Preprocessing.merge_data import merge_all_data
+from Data_Preprocessing.data_split import split_data
+from Data_Preprocessing.cleaning import drop_columns, check_data_info, fill_missing_values
+from IPython.display import display
+from Data_Preprocessing.outlier_handling import detect_outliers, plot_outliers
+from Data_Preprocessing.encoding import get_encode_cols, encode_features
+from Modeling.train_test import train_model, evaluate_model,predict_churners
+from Modeling.check import check_before_training
+from Modeling.save_model import save_train_test, save_submission, save_results, save_model, summarize_results
+from Display_graph.cm_fi_graph import plot_confusion_matrix, get_feature_importances
+from Display_graph.ac_ls_graph import plot_accuracy_loss
 
 # 실행 함수 
-def model_netflex():
+def model_Netflex():
 
-    # 1. 데이터 로드 #########################################################################################
-
-    # CSV 파일을 로드하여 데이터프레임에 주입
-    # 폴더 구조 다르니까 파일 경로 수정해야 함 
-    df = pd.read_csv('models/data/netflix_user_behavior_dataset.csv')
-
-    # 로드한 데이터 확인
-    print(f'{df.shape}')
-    print(f'{df.columns}')
-    print(f'{df.head(1)}')
-
-    # 로드한 데이터에서 결측치 있는지 체크
-    # 문제되는 데이터 있는지 확인
-    # 데이터 분석 진행 
-
-    # 2. 분리 전 사전 준비 #########################################################################################
-
-    # 타겟 데이터가 churned 인데 Yes / No 로 되어 있음 > 1, 0으로 변경해야 함 
-    df['churned'] = df['churned'].map({'Yes': 1, 'No': 0})
-
-    # 3. 데이터 분리 #########################################################################################
-
-    # feature와 target 데이터로 나눔
-    X = df.drop('churned',axis=1)
-    y = df['churned']
-
-    # train 과 test 데이터로 분리
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42) 
-
-    print(f'{X_train.shape}, {X_test.shape}, {y_train.shape}, {y_test.shape}')
+    # 1. 데이터 로드 
+    args          = get_args()                          # 경로/설정 로드
+    data          = load_data(args)                     # CSV 데이터 로드
+    Netflix_users = preprocess_target(data['user'])     # 타겟 변환
 
 
-    # 4. 데이터 전처리 #########################################################################################
+    plt.style.use('fivethirtyeight')
+    plt.ion()
 
-    train = X_train.copy()
-    test = X_test.copy()
-
-    # 컬럼 제거 (사용하지 않을 컬럼 drop)
-    # 1) 제거할 컬럼 리스트 정리
-    drop_columns = df.select_dtypes(exclude=np.number).columns
-    # 2) 컬럼 제거
-    train = train.drop(drop_columns, axis=1)
-    test = test.drop(drop_columns, axis=1)
-
-    # 3) 컬럼 제거 후 남은 컬럼 확인
-    print(f'{train.info()}')
-    print(f'{test.info()}')
-
-    # 결측치 제거
-    # 중복값 제거
-    # 인코딩 (숫자 아닌 컬럼 -> 숫자로 변경)
-
-    # 5. 모델 학습 (train 데이터 fit) #########################################################################################
-
-    # 모델 생성 -> 학습 (현재는 decision tree 모델 )
-    model = DecisionTreeClassifier()
-    model.fit(train, y_train) # 모델 학습 // train == 처리 후 X_train
-
-    # 6. 모델 예측 (test 데이터 pred) #########################################################################################
     
-    # 모델 예측 결과 확인
-    y_true = y_test
-    y_pred = model.predict(test) # 모델 예측 // test == 처리 후 X_test 
+    warnings.filterwarnings('ignore')
 
-    print(f'{y_pred.shape}')
-    print(f'{y_pred}')
-
-
-    # 7. 모델/결과 저장 #########################################################################################
-
-    # 학습한 모델 저장
-    joblib.dump(model, 'models/model_netflex.pkl') # 폴더 구조 다르니까 파일 경로 수정해야 함 
+    ori_train = pd.read_csv(args.train_csv)
+    ori_test = pd.read_csv(args.test_csv)
+    pd.read_csv(args.default_submission_csv).shape
     
-    # 8. 결과 표시 / 시각화 #########################################################################################
+    # 2. 데이터 병합
+    Netflix = merge_all_data(
+        user        = data['user'],
+        watch       = data['watch'],
+        movies      = data['movies'],
+        rec_logs    = data['rec_logs'],
+        search_logs = data['search_logs'],
+        reviews     = data['reviews']
+    )
+
+    # 3. 로드한 데이터 확인
+    print(f'{ori_train.shape, ori_test.shape}')
+    print(f'{Netflix.head()}')          
+
+    # 4. feature, target 분리
+    print(f'Netflix columns:\n{Netflix.columns.tolist()}')
+
+    split  = split_data(Netflix_users, ori_test)
+    X_tr   = split['X_tr']
+    X_te   = split['X_te']
+    y_tr   = split['y_tr']
+    y_te   = split['y_te']
+    train  = split['train']
+    test   = split['test']
+    ori_te = split['ori_te']
+
+    # 5. 로드한 데이터에서 결측치 있는지 체크
+    check_data_info(Netflix)
+    test_user_id = drop_columns(train, test, ori_te)
+    fill_missing_values(train, test, ori_te)
+
+
+    df_outlier_summary = detect_outliers(train)
+    display(df_outlier_summary)
+    plot_outliers(train)
+
+    # 6. 인코딩 (숫자 아닌 컬럼 -> 숫자로 변경)
+    enc_cols, normal_cols       = get_encode_cols(train)
+    enc_tr, enc_te, encoder     = encode_features(train, test, enc_cols, normal_cols)
+
+    # 7. 모델 학습 전 데이터 검증
+    check_before_training(enc_tr, enc_te)
+
+    # 8. 모델 학습 및 평가
+    model = train_model(enc_tr, y_tr)
+    score_tr, score_te, y_prob, y_pred, auc_te = evaluate_model(model, enc_tr, y_tr, enc_te, y_te)
+    predicted_churners = predict_churners(enc_te, y_prob, y_pred)
+
+    # 9. 모델/결과 저장 
+
+    save_train_test(args, X_tr, X_te)
+    save_model(args, model)            
+    submission_Netflix  = save_submission(args, X_te, model, enc_te)
+    results             = save_results(args, y_te, y_pred, auc_te)
+    Netflix_results     = summarize_results(args)
+
+    joblib.dump(model, args.default_path + 'model_Netflex.pkl')
+
+    # 10. 결과 표시 / 시각화
 
     # 정확도 확인 
-    accuracy = accuracy_score(y_true=y_true, y_pred=y_pred)
-    print(f'\n 정확도: {accuracy} \n')
+    plot_accuracy_loss(results)
 
-    # confusion matrix 
-    print(f'\n===confusion matrix===\n')
-    cm = confusion_matrix(y_true, y_pred)
-    print(cm)
+    # Confusion matrix 시각화 
+    plot_confusion_matrix(y_te, y_pred)
 
-    tn, fp, fn, tp = cm.ravel()
-    print(f'tn:{tn}')
-    print(f'fp:{fp}')
-    print(f'fn:{fn}')
-    print(f'tp:{tp}')
+    # feature 중요도
+    df_feature_importances = get_feature_importances(model, enc_tr, top_n=10)
 
-    print(f'\n===Classification Report===\n')
-    print(classification_report(y_true, y_pred))
-
-    # confusion matrix 시각화
-    plt.figure(figsize=(8,6)) # 그래프 영역
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
-    plt.xlabel('Pred_label')
-    plt.ylabel('True_label')
-    plt.title('confusion matrix')
-    plt.show()
-
-    # feature 중요도 확인 
-    feature_importance = pd.DataFrame({
-        'feature': train.columns,
-        'importance': model.feature_importances_,
-    }).sort_values('importance', ascending=False)
-
-    print('\n===상위 feature 10개===\n')
-    print(feature_importance.head(10))
-
+    input('엔터를 누르면 종료') 
 
 if __name__ == '__main__':
-    model_netflex()
+    model_Netflex()
