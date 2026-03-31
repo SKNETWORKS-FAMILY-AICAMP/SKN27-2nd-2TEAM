@@ -1,4 +1,7 @@
 # 백엔드 데이터 추출을 위한 패키지 (뼈대)
-pymysql
 pandas
-python-dotenv
+pymysql==1.1.2
+SQLAlchemy==2.0.48
+mysqlclient==2.2.8
+kagglehub==1.0.0
+cryptography
