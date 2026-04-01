@@ -121,11 +121,18 @@ def infer_segment_current_and_projected_prob(
     """
     세그먼트 기준 Before/After 평균 이탈확률(%)과 세그먼트 크기를 반환합니다.
     """
+    # 데이터 슬라이싱 
     segment_df = slice_users_by_segment(users_df, selected_segment_name)
     if segment_df.empty:
         raise ValueError("선택한 세그먼트에 해당하는 원본 데이터가 없습니다.")
 
+    # 데이터 슬라이스 한 시점에서 테이블 인코딩 적용 
+    
+
+    # 모델 로드 
     model = _load_model()
+
+    # 변경 전 데이터로 모델 추론 
     current_prob = _predict_churn_probability_pct(model, segment_df)
 
     if not submitted:

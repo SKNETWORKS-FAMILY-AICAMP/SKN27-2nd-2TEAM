@@ -16,6 +16,7 @@ from src.config.config import (
     SNAPSHOT_DELTA_DAYS,
     SIMULATOR_DATA_PATH,
     DASHBOARD_MODULES_DATA_PATH,
+    USERS_SOURCE_DATA_PATH
 )
 from src.utils.metrics_service import (
     build_age_active_histogram_data,
@@ -81,7 +82,7 @@ def load_simulator_data():
 @st.cache_data
 def load_simulator_source_users() -> pd.DataFrame:
     """시뮬레이터 모델 추론에 사용할 원본 사용자 데이터를 로드합니다."""
-    return pd.read_csv(KPI_SOURCE_DATA_PATH)
+    return pd.read_csv(USERS_SOURCE_DATA_PATH)
 
 
 @st.cache_data

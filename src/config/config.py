@@ -10,6 +10,7 @@ DATA_SAMPLE_PATH = BASE_DIR / "data" / "sample" / "sample_segment.csv"
 # UI 및 대시보드 데이터 경로
 UI_CONFIG_PATH = BASE_DIR / "src" / "config" / "ui_config.json"
 KPI_SOURCE_DATA_PATH = BASE_DIR / "data" / "sample" / "netflix_user_sample.csv"
+USERS_SOURCE_DATA_PATH = BASE_DIR / "data" / "server" / "users.csv"
 SIMULATOR_DATA_PATH = BASE_DIR / "data" / "sample" / "simulator_sample.csv"
 DASHBOARD_MODULES_DATA_PATH = BASE_DIR / "src" / "config" / "dashboard_modules.json"
 

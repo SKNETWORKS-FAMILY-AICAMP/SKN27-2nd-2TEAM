@@ -15,6 +15,7 @@ from src.utils.data_loader import (
     load_ui_config,
 )
 from src.utils.model_inference import infer_segment_current_and_projected_prob
+from src.utils.preprocess_users_data import preprocess_users_data
 
 
 def _load_analysis_page_config(ui_config: dict) -> dict:
@@ -80,8 +81,12 @@ def render_analysis():
     selection_config = page_cfg["selection"]
     form_config = page_cfg["form"]
 
+    # 시뮬레이터 설정용 데이터 로드 
     df_sample = load_simulator_data()
-    users_df = load_simulator_source_users()
+
+    # 유저 데이터 전처리 적용 
+    users_df = load_simulator_source_users() # users.csv 파일 로드 
+    users_df = preprocess_users_data(users_df) # 로드한 파일에서 학습에 사용한 것과 동일한 데이터 셋팅 
 
     # 2) 헤더 + 세그먼트 선택
     st.html(markup.page_header_analysis(header_config["title"], header_config["description"]))
