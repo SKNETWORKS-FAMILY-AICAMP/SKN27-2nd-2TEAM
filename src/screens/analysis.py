@@ -107,9 +107,8 @@ def render_analysis():
             selected_segment_name=selected_segment_name,
             submitted=form_state.submit,
             subscription_type=form_state.subscription_type,
-            monthly_revenue=form_state.monthly_revenue,
-            viewing_hours=form_state.viewing_hours,
-            support_calls=form_state.support_calls,
+            primary_device=form_state.primary_device,
+            household_size=form_state.household_size,
         )
     except Exception as exc:
         st.error(f"모델 추론 중 오류가 발생했습니다: {exc}")

@@ -88,15 +88,14 @@
       "title": "파라미터 조정",
       "section_icon": "tune",
       "subscription_type_label": "요금제 유형",
-      "subscription_type_options": ["dontcare", "Basic", "Standard", "Premium"],
-      "monthly_revenue_label": "월 청구액 ($)",
-      "viewing_hours_label": "주간 시청 시간 (시간)",
-      "customer_support_calls_label": "고객 지원 문의 횟수",
+      "subscription_type_options": ["dontcare", "Basic", "Standard", "Premium", "Premium+"],
+      "primary_device_label": "주 사용 기기",
+      "primary_device_options": ["dontcare", "Laptop", "Desktop", "Gaming Console", "Tablet", "Mobile", "Smart TV"],
+      "household_size_use_label": "가구원 수 변경하기",
+      "household_size_label": "가구원 수 (명)",
       "button_label": "시뮬레이션 실행",
-      "viewing_hours_max": 200.0,
-      "viewing_hours_step": 0.5,
-      "support_calls_max": 20,
-      "support_calls_step": 1
+      "household_size_max": 8,
+      "household_size_step": 1
     },
     "layout": {
       "columns": [4, 8],
