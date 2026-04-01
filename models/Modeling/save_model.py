@@ -19,12 +19,9 @@ def save_train_test(args, X_tr: pd.DataFrame, X_te: pd.DataFrame) -> None:
 # ─────────────────────────────────────────
 # 2. 제출 파일 저장
 # ─────────────────────────────────────────
-def save_submission(args, X_te: pd.DataFrame,
-                    model, enc_te: pd.DataFrame) -> pd.DataFrame:
-    """제출용 CSV 생성 및 저장"""
-    submission_Netflix = X_te[['user_id']].copy()
-    submission_Netflix['is_churned'] = 0
-    submission_Netflix.to_csv(args.default_submission_csv, index=False)
+def save_submission(args, test_user_id: pd.Series, model, enc_te) -> pd.DataFrame:
+    
+    submission_Netflix = pd.DataFrame({'user_id': test_user_id.values})
     submission_Netflix['is_churned'] = model.predict(enc_te)
     submission_Netflix.to_csv(args.default_submission_csv, index=False)
     print(f'제출 파일 저장 완료: {args.default_submission_csv}')

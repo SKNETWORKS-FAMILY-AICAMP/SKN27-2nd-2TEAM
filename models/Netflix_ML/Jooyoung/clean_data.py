@@ -8,7 +8,7 @@ def verify_refine_logic():
     
     print(f"--- 검증 시작 (작업 경로: {base_path}) ---")
 
-    try:
+try:
         # 1. 파일 로드
         users = pd.read_csv(os.path.join(base_path, 'users.csv'))
         watch = pd.read_csv(os.path.join(base_path, 'watch_history.csv'))
@@ -16,23 +16,26 @@ def verify_refine_logic():
         recommend = pd.read_csv(os.path.join(base_path, 'recommendation_logs.csv'))
         print("✔ 1. 모든 원본 데이터 로드 성공")
 
-        # 2. 계정 생성 개월수 계산 (account_age_months)
-        users['subscription_start_date'] = pd.to_datetime(users['subscription_start_date'])
+        # 2. 날짜 처리 (errors='coerce' 추가로 안전하게)
+        users['subscription_start_date'] = pd.to_datetime(users['subscription_start_date'], errors='coerce')
+        # 결측치가 생길 수 있으므로 dropna 또는 fillna 처리
         ref_date = users['subscription_start_date'].max()
-        users['account_age_months'] = ((ref_date.year - users['subscription_start_date'].dt.year) * 12 + 
-                                       (ref_date.month - users['subscription_start_date'].dt.month))
-        print("✔ 2. 계정 생성 개월수 계산 완료")
-
-        # 3. 사용 기기 수 계산 (devices_used)
-        combined_logs = pd.concat([
-            watch[['user_id', 'device_type']],
-            search[['user_id', 'device_type']],
-            recommend[['user_id', 'device_type']]
-        ]).drop_duplicates()
         
-        device_counts = combined_logs.groupby('user_id')['device_type'].nunique().reset_index()
-        device_counts.columns = ['user_id', 'devices_used']
-        print("✔ 3. 로그 기반 기기 이용 수 집계 완료")
+        # 3. 사용 기기 수 계산 (컬럼 존재 확인 후 concat)
+        log_list = []
+        for df, name in zip([watch, search, recommend], ['watch', 'search', 'recommend']):
+            if 'device_type' in df.columns:
+                log_list.append(df[['user_id', 'device_type']])
+            else:
+                print(f"⚠ 경고: {name} 로그에 'device_type'이 없습니다.")
+
+        if log_list:
+            combined_logs = pd.concat(log_list).drop_duplicates()
+            device_counts = combined_logs.groupby('user_id')['device_type'].nunique().reset_index()
+            device_counts.columns = ['user_id', 'devices_used']
+        else:
+            # 로그에 기기 정보가 전혀 없을 경우 대비
+            device_counts = pd.DataFrame(columns=['user_id', 'devices_used'])
 
         # 4. 컬럼명 매핑 및 정제
         mapping = {
@@ -44,7 +47,17 @@ def verify_refine_logic():
             'primary_device': 'primary_device'
         }
         
-        refined = users[['user_id', 'age', 'gender', 'country', 'subscription_plan', 'monthly_spend', 'primary_device', 'account_age_months']].copy()
+                # 가져오고자 하는 전체 컬럼 리스트
+        base_cols = ['user_id', 'age', 'gender', 'country', 'subscription_plan', 
+                    'monthly_spend', 'primary_device', 'account_age_months']
+
+        # 1) 실제로 users 데이터프레임에 존재하는 컬럼만 선별
+        existing_cols = [c for c in base_cols if c in users.columns]
+
+        # 2) 안전하게 추출 (KeyError 방지)
+        refined = users[existing_cols].copy()
+
+        # 3) 컬럼명 변경 (기존 mapping 사용)
         refined = refined.rename(columns=mapping)
 
         # 5. 데이터 병합 및 결측치 처리
@@ -69,8 +82,8 @@ def verify_refine_logic():
         
         print("\n✔ 모든 로직이 정상적으로 실행되었습니다. (파일 저장은 수행되지 않음)")
 
-    except Exception as e:
-        print(f"\n❌ 오류 발생: {e}")
+except Exception as e:
+    print(f"\n❌ 오류 발생: {e}")
 
 if __name__ == "__main__":
     verify_refine_logic()
