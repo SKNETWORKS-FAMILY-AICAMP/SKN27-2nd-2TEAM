@@ -8,7 +8,7 @@ reset_seeds(42)
 # ─────────────────────────────────────────
 # 1. 경로 설정
 # ─────────────────────────────────────────
-def get_args(default_path: str = 'C:/dev/project/SKN27-2nd-2TEAM/models/data/') -> easydict.EasyDict:
+def get_args(default_path: str = 'C:/dev/project/mini_project/SKN27-2nd-2TEAM/models/data/') -> easydict.EasyDict:
     """경로 및 파일 설정을 담은 EasyDict 반환"""
     args = easydict.EasyDict()
     args.default_path = default_path
@@ -27,7 +27,6 @@ def get_args(default_path: str = 'C:/dev/project/SKN27-2nd-2TEAM/models/data/') 
     args.submission_filename     = 'Netflix_submission.csv'
     args.default_submission_csv  = default_path + args.submission_filename
     args.save_results            = default_path + 'Netflix_results.json'
-    args.netflix_users_csv       = default_path + 'netflix_users.csv'
 
     # 분석용 설정
     args.random_state = 21
