@@ -31,7 +31,7 @@ from Display_graph.cm_fi_graph import plot_confusion_matrix, get_feature_importa
 from Display_graph.ac_ls_graph import plot_accuracy_loss
 
 # 실행 함수 
-def model_Netflex():
+def model_Netflix():
 
     # 1. 데이터 로드 
     args          = get_args()                          # 경로/설정 로드
@@ -121,4 +121,4 @@ def model_Netflex():
     input('엔터를 누르면 종료') 
 
 if __name__ == '__main__':
-    model_Netflex()
+    model_Netflix()
