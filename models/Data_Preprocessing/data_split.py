@@ -18,9 +18,12 @@ def split_data(Netflix_users: pd.DataFrame, ori_test: pd.DataFrame,
     )
 
     # 3. 복사본 생성
-    train  = X_tr.copy()
-    test   = X_te.copy()
-    ori_te = ori_test.copy()
+    train = X_tr.copy()
+    train['is_churned'] = y_tr
+
+    test = X_te.copy()
+    test['is_churned'] = y_te
+    ori_te = X_te.copy()
 
     # 결과 확인
     print(f'X_tr: {X_tr.shape}, X_te: {X_te.shape}')

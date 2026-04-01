@@ -22,11 +22,32 @@ def drop_columns(train: pd.DataFrame, test: pd.DataFrame, ori_te: pd.DataFrame) 
 
     print(f'before: {train.shape} / {test.shape}')
 
-    drop_cols = ['user_id', 'email', 'first_name', 'last_name',
-                'created_at', 'country', 'state_province', 'city']
+    drop_cols = [
+    # 식별자 (모델에 불필요)
+    'user_id',
+    
+    # 개인정보 (모델에 불필요)
+    'email',
+    'first_name',
+    'last_name',
+    
+    # 날짜형 문자열 (이미 account_age_months로 변환됨)
+    'subscription_start_date',
+    'created_at',
+    
+    # 날짜형 (이미 days_since_last_activity로 변환됨)
+    'last_activity_date',
+    
+    # 세분화된 지역 (country로 대체 가능)
+    'state_province',
+    'city',
+]
 
     for df in [train, test, ori_te]:
-        df.drop(columns=drop_cols, axis=1, inplace=True)
+        # df.columns에 있는 컬럼만 골라서 제거 (에러 방지)
+        cols_to_drop = [c for c in drop_cols if c in df.columns]
+        df.drop(columns=cols_to_drop, axis=1, inplace=True, errors='ignore')
+
 
     print(f'after: {train.shape} / {test.shape}')
     train.info()
@@ -67,12 +88,12 @@ def fill_missing_values(train: pd.DataFrame, test: pd.DataFrame, ori_te: pd.Data
     for df in [train, test, ori_te]:
         df['age_group'] = df['age'].apply(get_age_group)
 
-    # 3. 10대 monthly_spend 결측치 → 0
+    # 3. 10대 monthly_fee 결측치 → 0
     for df in [train, test, ori_te]:
-        df.loc[(df['age_group'] == '10s') & (df['monthly_spend'].isna()), 'monthly_spend'] = 0
+        df.loc[(df['age_group'] == '10s') & (df['monthly_fee'].isna()), 'monthly_fee'] = 0
 
     # 4. 수치형 컬럼 연령대별 중앙값으로 채우기
-    fill_cols = ['monthly_spend', 'household_size']
+    fill_cols = ['monthly_fee', 'household_size']
 
     for col in fill_cols:
         medians        = train.groupby('age_group')[col].median()
