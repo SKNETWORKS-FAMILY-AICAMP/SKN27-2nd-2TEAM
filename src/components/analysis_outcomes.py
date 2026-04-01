@@ -2,12 +2,13 @@
 분석 화면 우열 결과 패널.
 
 - Current vs Simulated KPI 카드 (`ui_config.analysis.compare_cards`)
-- `build_churn_compare_histogram` + `st.bar_chart` 분포 비교 (`churn_compare_chart`)
+- 세그먼트 사용자별 예측 확률 히스토그램 + `st.bar_chart` (`churn_compare_chart`)
 - AI 요약 카드 (`analysis.ai_comment`)
 """
 
 from __future__ import annotations
 
+import numpy as np
 import streamlit as st
 
 from src.design import markup
@@ -61,14 +62,13 @@ def _render_kpi_compare_row(
 
 def _render_histogram_section(
     *,
-    current_prob: float,
-    projected_prob: float,
+    current_probs_pct: np.ndarray,
+    projected_probs_pct: np.ndarray,
     chart_copy: dict,
     histogram_height: int,
 ) -> None:
     """Current/Simulated 히스토그램 섹션."""
-    # 동일 bin 기준으로 두 분포를 비교하기 위한 참고용 데이터프레임.
-    df_hist = build_churn_compare_histogram(current_prob, projected_prob)
+    df_hist = build_churn_compare_histogram(current_probs_pct, projected_probs_pct)
     with st.container(border=True):
         st.markdown(f"**{chart_copy['title']}**")
         if chart_copy.get("caption"):
@@ -103,6 +103,8 @@ def render_analysis_outcomes(
     *,
     base_churn_prob: float,
     projected_prob: float,
+    current_probs_pct: np.ndarray,
+    projected_probs_pct: np.ndarray,
     selected_segment_name: str,
     compare_cfg: dict,
     chart_copy: dict,
@@ -122,8 +124,8 @@ def render_analysis_outcomes(
     )
     st.html(markup.spacer_height(layout_cfg["results_section_spacer"]))
     _render_histogram_section(
-        current_prob=base_churn_prob,
-        projected_prob=projected_prob,
+        current_probs_pct=current_probs_pct,
+        projected_probs_pct=projected_probs_pct,
         chart_copy=chart_copy,
         histogram_height=layout_cfg["histogram_height"],
     )

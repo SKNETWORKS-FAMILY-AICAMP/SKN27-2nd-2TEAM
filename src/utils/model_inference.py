@@ -2,7 +2,7 @@
 세그먼트 슬라이싱 + 모델 추론 유틸.
 
 - simulator_sample의 segment_name을 원본 사용자 데이터 필터 조건으로 매핑
-- `model_netflix.pkl` 로드 후 `predict_proba` 평균값(%) 계산
+- `model_netflix.pkl` 로드 후 `predict_proba` 평균(%) 및 사용자별 확률(%) 배열
 - 폼 파라미터를 세그먼트 row 전체에 일괄 적용한 after 예측 계산
 """
 
@@ -68,20 +68,28 @@ def _load_model() -> Any:
             return pickle.load(f)
 
 
-def _to_probability_percent(raw_scores: np.ndarray) -> float:
+def _churn_probs_column_to_percent(raw_scores: np.ndarray) -> np.ndarray:
+    """predict_proba 이탈 클래스 열을 KPI와 동일 스케일의 퍼센트 배열로 변환합니다."""
+    raw_scores = np.asarray(raw_scores, dtype=np.float64)
     raw_mean = float(np.mean(raw_scores))
     if raw_mean <= 1.0:
-        return round(raw_mean * 100.0, 1)
-    return round(raw_mean, 1)
+        out = raw_scores * 100.0
+    else:
+        out = raw_scores.copy()
+    return np.clip(out, 0.0, 100.0)
 
 
-def _predict_churn_probability_pct(model: Any, df_features: pd.DataFrame) -> float:
+def _predict_churn_prob_mean_and_per_user_pct(
+    model: Any, df_features: pd.DataFrame
+) -> tuple[float, np.ndarray]:
     if not hasattr(model, "predict_proba"):
         raise ValueError("모델이 predict_proba를 지원하지 않습니다.")
     probs = model.predict_proba(df_features)
     if probs.ndim != 2 or probs.shape[1] < 2:
         raise ValueError("predict_proba 결과 형식이 올바르지 않습니다.")
-    return _to_probability_percent(probs[:, 1])
+    pct = _churn_probs_column_to_percent(probs[:, 1])
+    mean_pct = round(float(np.mean(pct)), 1)
+    return mean_pct, pct
 
 
 def _apply_policy_to_segment(
@@ -139,9 +147,10 @@ def infer_segment_current_and_projected_prob(
     subscription_type: str,
     primary_device: str,
     household_size: float | None,
-) -> tuple[float, float, int]:
+) -> tuple[float, float, int, np.ndarray, np.ndarray]:
     """
-    세그먼트 기준 Before/After 평균 이탈확률(%)과 세그먼트 크기를 반환합니다.
+    세그먼트 기준 Before/After 평균 이탈확률(%), 세그먼트 크기,
+    사용자별 현재/시뮬레이션 이탈확률(%) 배열을 반환합니다.
     """
     segment_df = slice_users_by_segment(users_df, selected_segment_name)
     if segment_df.empty:
@@ -156,12 +165,13 @@ def infer_segment_current_and_projected_prob(
     if 'churned' in segment_df.columns:
         segment_df = segment_df.drop(columns=['churned'])
 
-    # 변경 전 데이터로 모델 추론 
     current_features = _encode_features(segment_df, expected_columns)
-    current_prob = _predict_churn_probability_pct(model, current_features)
+    current_prob, current_probs = _predict_churn_prob_mean_and_per_user_pct(
+        model, current_features
+    )
 
     if not submitted:
-        return current_prob, current_prob, len(segment_df)
+        return current_prob, current_prob, len(segment_df), current_probs, current_probs.copy()
 
     updated_df = _apply_policy_to_segment(
         segment_df,
@@ -169,8 +179,10 @@ def infer_segment_current_and_projected_prob(
         primary_device=primary_device,
         household_size=household_size,
     )
-    
+
     projected_features = _encode_features(updated_df, expected_columns)
-    projected_prob = _predict_churn_probability_pct(model, projected_features)
-    
-    return current_prob, projected_prob, len(segment_df)
+    projected_prob, projected_probs = _predict_churn_prob_mean_and_per_user_pct(
+        model, projected_features
+    )
+
+    return current_prob, projected_prob, len(segment_df), current_probs, projected_probs

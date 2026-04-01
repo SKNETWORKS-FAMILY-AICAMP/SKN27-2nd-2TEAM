@@ -2,7 +2,6 @@ import streamlit as st
 from src.design.styles import apply_streamlit_page_config, inject_custom_css
 from src.components.sidebar import render_sidebar
 from src.screens.dashboard import render_dashboard
-from src.screens.churn_stats import render_churn_stats
 from src.screens.analysis import render_analysis
 
 def main():
@@ -22,8 +21,6 @@ def main():
     
     if current_page == "Home":
         render_dashboard()
-    elif current_page == "ChurnStats":
-        render_churn_stats()
     elif current_page == "Analysis":
         render_analysis()
 

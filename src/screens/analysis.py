@@ -52,6 +52,8 @@ def _render_analysis_results(
     col,
     base_churn_prob: float,
     projected_prob: float,
+    current_probs_pct,
+    projected_probs_pct,
     selected_segment_name: str,
     page_cfg: dict,
 ) -> None:
@@ -60,6 +62,8 @@ def _render_analysis_results(
         render_analysis_outcomes(
             base_churn_prob=base_churn_prob,
             projected_prob=projected_prob,
+            current_probs_pct=current_probs_pct,
+            projected_probs_pct=projected_probs_pct,
             selected_segment_name=selected_segment_name,
             compare_cfg=page_cfg["compare_cards"],
             chart_copy=page_cfg["chart_copy"],
@@ -102,13 +106,15 @@ def render_analysis():
         form_state = render_simulator_form(selected_row, form_config)
 
     try:
-        current_prob, projected_prob, _ = infer_segment_current_and_projected_prob(
-            users_df,
-            selected_segment_name=selected_segment_name,
-            submitted=form_state.submit,
-            subscription_type=form_state.subscription_type,
-            primary_device=form_state.primary_device,
-            household_size=form_state.household_size,
+        current_prob, projected_prob, _, cur_probs, proj_probs = (
+            infer_segment_current_and_projected_prob(
+                users_df,
+                selected_segment_name=selected_segment_name,
+                submitted=form_state.submit,
+                subscription_type=form_state.subscription_type,
+                primary_device=form_state.primary_device,
+                household_size=form_state.household_size,
+            )
         )
     except Exception as exc:
         st.error(f"모델 추론 중 오류가 발생했습니다: {exc}")
@@ -118,6 +124,8 @@ def render_analysis():
         col=col2,
         base_churn_prob=current_prob,
         projected_prob=projected_prob,
+        current_probs_pct=cur_probs,
+        projected_probs_pct=proj_probs,
         selected_segment_name=selected_segment_name,
         page_cfg=page_cfg,
     )
