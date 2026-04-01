@@ -10,6 +10,7 @@
     "subtitle": "Precision Curator",
     "menu": {
       "Home": "🏠 Home",
+      "ChurnStats": "📊 월별 이탈 통계",
       "Analysis": "📈 고객 이탈 분석"
     }
   },
