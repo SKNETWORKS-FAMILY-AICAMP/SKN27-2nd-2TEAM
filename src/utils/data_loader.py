@@ -79,6 +79,12 @@ def load_simulator_data():
 
 
 @st.cache_data
+def load_simulator_source_users() -> pd.DataFrame:
+    """시뮬레이터 모델 추론에 사용할 원본 사용자 데이터를 로드합니다."""
+    return pd.read_csv(KPI_SOURCE_DATA_PATH)
+
+
+@st.cache_data
 def load_dashboard_modules_data():
     """대시보드 하단 3모듈용 JSON 데이터를 로드합니다."""
     with open(DASHBOARD_MODULES_DATA_PATH, "r", encoding="utf-8") as f:

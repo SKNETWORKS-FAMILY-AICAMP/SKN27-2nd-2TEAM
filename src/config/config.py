@@ -19,7 +19,7 @@ SNAPSHOT_DELTA_DAYS = 7
 INACTIVE_DAYS_THRESHOLD = 30
 
 # 모델 및 전처리 파일 경로
-MODEL_PATH = BASE_DIR / "models" / "model.pkl"
+MODEL_PATH = BASE_DIR / "data" / "model_Netflex.pkl"
 PREPROCESSOR_PATH = BASE_DIR / "models" / "preprocessor.pkl"
 
 

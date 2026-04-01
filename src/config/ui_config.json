@@ -88,7 +88,7 @@
       "title": "파라미터 조정",
       "section_icon": "tune",
       "subscription_type_label": "요금제 유형",
-      "subscription_type_options": ["Basic", "Standard", "Premium"],
+      "subscription_type_options": ["dontcare", "Basic", "Standard", "Premium"],
       "monthly_revenue_label": "월 청구액 ($)",
       "viewing_hours_label": "주간 시청 시간 (시간)",
       "customer_support_calls_label": "고객 지원 문의 횟수",
@@ -109,12 +109,16 @@
       "high_risk_churn_prob": 30.0
     },
     "simulator_heuristics": {
+      "baseline_prob": 28.0,
       "plan_delta": {
+        "dontcare": 0.0,
         "Premium": -3.0,
         "Basic": 5.0,
         "_default": 1.0
       },
+      "viewing_hours_ref": 24.0,
       "viewing_hours_divisor": 10.0,
+      "support_calls_ref": 2,
       "support_calls_weight": 5.0,
       "min_prob": 1.0,
       "max_prob": 99.0

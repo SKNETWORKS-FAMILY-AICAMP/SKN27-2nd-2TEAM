@@ -7,12 +7,14 @@ Analysis 라우트 화면: 세그먼트 선택 + 시뮬레이터 폼 + 결과 �
 """
 import streamlit as st
 from src.components.analysis_outcomes import render_analysis_outcomes
-from src.components.analysis_simulator import (
-    project_churn_probability,
-    render_simulator_form,
-)
+from src.components.analysis_simulator import render_simulator_form
 from src.design import markup
-from src.utils.data_loader import load_ui_config, load_simulator_data
+from src.utils.data_loader import (
+    load_simulator_data,
+    load_simulator_source_users,
+    load_ui_config,
+)
+from src.utils.model_inference import infer_segment_current_and_projected_prob
 
 
 def _load_analysis_page_config(ui_config: dict) -> dict:
@@ -42,19 +44,6 @@ def _resolve_selected_segment(df_sample, selection_config: dict):
     )
     selected_row = df_sample[df_sample["segment_name"] == selected_segment_name].iloc[0]
     return selected_segment_name, selected_row
-
-
-def _compute_projected_prob(base_churn_prob, selected_row, page_cfg, form_state) -> float:
-    """폼 입력값과 휴리스틱 설정으로 시뮬레이션 이탈률을 계산합니다."""
-    return project_churn_probability(
-        base_churn_prob,
-        selected_row,
-        page_cfg["heuristics"],
-        submitted=form_state.submit,
-        subscription_type=form_state.subscription_type,
-        viewing_hours=form_state.viewing_hours,
-        support_calls=form_state.support_calls,
-    )
 
 
 def _render_analysis_results(
@@ -92,6 +81,7 @@ def render_analysis():
     form_config = page_cfg["form"]
 
     df_sample = load_simulator_data()
+    users_df = load_simulator_source_users()
 
     # 2) 헤더 + 세그먼트 선택
     st.html(markup.page_header_analysis(header_config["title"], header_config["description"]))
@@ -100,19 +90,29 @@ def render_analysis():
 
     st.html(markup.spacer_analysis_segment())
 
-    # 선택 세그먼트의 기준 이탈률.
-    base_churn_prob = float(selected_row["base_churn_prob"])
-
     col1, col2 = st.columns(page_cfg["layout"]["columns"], gap=page_cfg["layout"]["gap"])
 
     # 3) 좌측 입력 폼 / 우측 결과 패널
     with col1:
         form_state = render_simulator_form(selected_row, form_config)
 
-    projected_prob = _compute_projected_prob(base_churn_prob, selected_row, page_cfg, form_state)
+    try:
+        current_prob, projected_prob, _ = infer_segment_current_and_projected_prob(
+            users_df,
+            selected_segment_name=selected_segment_name,
+            submitted=form_state.submit,
+            subscription_type=form_state.subscription_type,
+            monthly_revenue=form_state.monthly_revenue,
+            viewing_hours=form_state.viewing_hours,
+            support_calls=form_state.support_calls,
+        )
+    except Exception as exc:
+        st.error(f"모델 추론 중 오류가 발생했습니다: {exc}")
+        return
+
     _render_analysis_results(
         col=col2,
-        base_churn_prob=base_churn_prob,
+        base_churn_prob=current_prob,
         projected_prob=projected_prob,
         selected_segment_name=selected_segment_name,
         page_cfg=page_cfg,

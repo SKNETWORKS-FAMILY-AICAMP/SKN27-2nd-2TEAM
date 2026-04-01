@@ -1,8 +1,7 @@
 """
-분석(이탈 시뮬레이터) 화면 좌열 및 예측 휴리스틱.
+분석(이탈 시뮬레이터) 화면 좌열 입력 폼.
 
 - `render_simulator_form`: `ui_config.analysis.form` 기반 `st.form` (키 `simulator_form` 유지)
-- `project_churn_probability`: 제출 시 요금제·시청·문의 변화를 반영한 표시용 이탈률(%)
 - `SimulatorFormState`: 폼 위젯 값과 제출 여부를 우열 간 전달할 때 사용
 """
 
@@ -25,41 +24,6 @@ class SimulatorFormState:
     monthly_revenue: float
     viewing_hours: float
     support_calls: int
-
-
-def project_churn_probability(
-    base_churn_prob: float,
-    selected_row: pd.Series,
-    heuristics_cfg: dict,
-    *,
-    submitted: bool,
-    subscription_type: str,
-    viewing_hours: float,
-    support_calls: int,
-) -> float:
-    """제출 시 파라미터 변화를 반영한 예측 이탈률(%). 미제출이면 베이스값 그대로."""
-    if not submitted:
-        return float(base_churn_prob)
-
-    # 요금제 변경 시 가중치(설정값) 적용.
-    plan_delta_cfg = heuristics_cfg["plan_delta"]
-    def_sub_type = selected_row["subscription_type"]
-    calc_prob = float(base_churn_prob)
-
-    if def_sub_type != subscription_type:
-        calc_prob += float(plan_delta_cfg.get(subscription_type, plan_delta_cfg["_default"]))
-
-    # 시청 시간 증가는 이탈률을 낮추는 방향(감산).
-    hours_diff = viewing_hours - float(selected_row["viewing_hours"])
-    calc_prob -= hours_diff / float(heuristics_cfg["viewing_hours_divisor"])
-
-    # 고객센터 문의 증가는 이탈률을 높이는 방향(가산).
-    calls_diff = support_calls - int(selected_row["customer_support_calls"])
-    calc_prob += calls_diff * float(heuristics_cfg["support_calls_weight"])
-
-    # 예측치 안정화를 위해 최소/최대 범위로 클램프.
-    calc_prob = max(float(heuristics_cfg["min_prob"]), min(float(heuristics_cfg["max_prob"]), calc_prob))
-    return round(calc_prob, 1)
 
 
 def _resolve_subscription_defaults(selected_row: pd.Series, form_config: dict) -> tuple[str, int]:

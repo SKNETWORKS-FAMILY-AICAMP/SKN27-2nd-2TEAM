@@ -1,5 +1,7 @@
-segment_name,base_churn_prob,subscription_type,monthly_revenue,viewing_hours,customer_support_calls
-신규 가입자 (1개월 미만),18.0,Basic,9.99,15.0,2
-일반 사용자 (Standard),15.5,Standard,15.99,35.5,1
-충성 고객 (Premium),5.0,Premium,22.99,60.0,0
-위험군 (문의 다수),35.0,Standard,15.99,20.0,5
+segment_name,segment_size,subscription_type,monthly_revenue,viewing_hours,customer_support_calls
+휴면_위험군 (기준: 최근 미접속일>=45 또는 완료율<=45),15907,Standard,12.33,22.8,5
+일반_안정군 (기준: 다른 세그먼트 조건에 해당하지 않는 기본군),17434,Standard,12.31,22.8,3
+충성_헤비시청군 (기준: 가입기간>=36개월 and 평균시청시간>=200분),6992,Standard,12.31,41.6,3
+모바일_라이트시청군 (기준: 주기기=Mobile and 평균시청시간<120분),2493,Standard,12.34,10.7,3
+신규_온보딩군 (기준: 가입기간<=6개월),5150,Standard,12.28,26.1,3
+프리미엄_헤비시청군 (기준: 요금제=Premium and 평균시청시간>=180분),2024,Premium,12.51,38.9,3
