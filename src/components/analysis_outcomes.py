@@ -11,6 +11,7 @@ from __future__ import annotations
 import streamlit as st
 
 from src.design import markup
+from src.design.common import COLORS
 from src.utils.churn_histogram import build_churn_compare_histogram
 
 
@@ -22,8 +23,8 @@ def _build_delta_view_model(current_prob: float, projected_prob: float) -> dict:
     return {
         "prob_delta": prob_delta,
         "trend_icon": "trending_down" if is_improved else "trending_up",
-        "delta_color": "#16a34a" if is_improved else "#dc2626",
-        "delta_bg": "#f0fdf4" if is_improved else "#fef2f2",
+        "delta_color": COLORS["success"] if is_improved else COLORS["danger"],
+        "delta_bg": COLORS["success_light"] if is_improved else COLORS["primary_light"],
         "delta_text": f"{prob_delta:+.1f}% Delta",
     }
 

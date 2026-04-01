@@ -209,7 +209,7 @@ def analysis_ai_comment_card(
         projected=_safe(f"{projected_prob}%"),
     )
     badge = "primary" if is_high_risk else "positive"
-    bg = COLORS["primary_light"] if is_high_risk else "#f0fdf4"
+    bg = COLORS["primary_light"] if is_high_risk else COLORS["success_light"]
     risk_color = COLORS["danger"] if is_high_risk else COLORS["success"]
     risk_icon = "warning" if is_high_risk else "check_circle"
     return dedent(f"""

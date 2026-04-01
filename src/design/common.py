@@ -12,6 +12,7 @@ COLORS = {
     "text_muted": "#64748b",  # 부가 설명·보조 텍스트
     "border": "#f1f5f9",  # 구분선·카드 테두리
     "success": "#16a34a",
+    "success_light": "#f0fdf4",
     "danger": "#dc2626",
     "info_light": "#f1f5f9",
     "text_soft": "#94a3b8",

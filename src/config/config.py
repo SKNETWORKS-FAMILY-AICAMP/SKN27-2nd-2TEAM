@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 # 프로젝트 루트 경로
@@ -20,3 +21,14 @@ INACTIVE_DAYS_THRESHOLD = 30
 # 모델 및 전처리 파일 경로
 MODEL_PATH = BASE_DIR / "models" / "model.pkl"
 PREPROCESSOR_PATH = BASE_DIR / "models" / "preprocessor.pkl"
+
+
+def load_ui_config_dict() -> dict:
+    """UI 설정 JSON 전체를 로드합니다."""
+    with open(UI_CONFIG_PATH, "r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def load_app_shell_config() -> dict:
+    """페이지 셸 설정(`ui_config.app`)만 반환합니다."""
+    return (load_ui_config_dict().get("app") or {})

@@ -3,13 +3,13 @@ from src.design.common import get_common_css, COLORS
 from src.design.sidebar import get_sidebar_css
 from src.design.metrics import get_metrics_css
 from src.design.charts import get_charts_css
-from src.utils.data_loader import load_ui_config
+from src.config.config import load_app_shell_config
 
 
 def apply_streamlit_page_config():
     """브라우저 탭 제목·아이콘·wide 레이아웃 등 앱 셸 설정 (`ui_config.app`)."""
     # 페이지 셸 설정은 ui_config.app을 기준으로 주입합니다.
-    cfg = load_ui_config().get("app") or {}
+    cfg = load_app_shell_config()
     st.set_page_config(
         page_title=cfg.get("page_title", "Streamlit"),
         page_icon=cfg.get("page_icon"),
