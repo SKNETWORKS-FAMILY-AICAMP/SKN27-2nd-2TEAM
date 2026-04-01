@@ -15,6 +15,6 @@ def check_before_training(train_features:pd.DataFrame, test:pd.DataFrame) -> Non
         # 2. 학습(train) & 평가(test) 모두 결측치가 없어야 함
         raise Exception("학습(train) & 평가(test) 모두 결측치가 존재")
     elif (not train_features.select_dtypes(exclude=[np.number, 'category']).empty) \
-        or (not train_features.select_dtypes(exclude=[np.number, 'category']).empty):
+        or (not test.select_dtypes(exclude=[np.number, 'category']).empty):
         # 3. 학습(train) & 평가(test) 모두 문자열 데이터가 없거나, category로 형변환 되어있어야 함
         raise Exception("학습(train) & 평가(test) 모두 문자열 데이터가 존재")
