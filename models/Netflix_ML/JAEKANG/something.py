@@ -1,5 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+
 class NetflixFeatureBuilder:
     def __init__(self, user, watch=None, reviews=None, rec_logs=None, search_logs=None, movies=None):
         self.user = user.copy()
@@ -554,6 +556,171 @@ class NetflixFeatureBuilder:
 
         return self
 
+    def add_review_helpfulness_ratio(self):
+        # -------------------------------------------------
+        # review_helpfulness_ratio 만들기
+        #
+        # 정의:
+        # user별 리뷰 유용성 비율 평균
+        # = (helpful_votes / total_votes)의 user 평균
+        #
+        # 결측 처리:
+        # - total_votes == 0 이면 비율 정의 불가 -> NaN
+        # - 유효한 리뷰 비율이 하나도 없는 user는 최종 0으로 채움
+        # -------------------------------------------------
+
+        # 1. 필요한 컬럼만 복사
+        review_tmp = self.reviews[['user_id', 'helpful_votes', 'total_votes']].copy()
+
+        # 2. 숫자형 변환
+        review_tmp['helpful_votes'] = pd.to_numeric(
+            review_tmp['helpful_votes'],
+            errors='coerce'
+        )
+        review_tmp['total_votes'] = pd.to_numeric(
+            review_tmp['total_votes'],
+            errors='coerce'
+        )
+
+        # 3. 리뷰 행 기준 helpfulness ratio 계산
+        # total_votes가 0이면 비율은 정의 불가하므로 NaN 처리
+        review_tmp['review_helpfulness_ratio_row'] = (
+            review_tmp['helpful_votes']
+            / review_tmp['total_votes'].replace(0, np.nan)
+        )
+
+        # 4. 혹시 이상값이 있으면 0~1 범위로 제한
+        review_tmp['review_helpfulness_ratio_row'] = review_tmp[
+            'review_helpfulness_ratio_row'
+        ].clip(lower=0, upper=1)
+
+        # 5. user별 평균 계산
+        review_helpfulness_ratio_map = (
+            review_tmp.groupby('user_id')['review_helpfulness_ratio_row']
+            .mean()
+            .to_dict()
+        )
+
+        # 6. new_user에 컬럼 추가
+        # 유효한 리뷰 비율이 하나도 없는 user는 0으로 채움
+        self.new_user['review_helpfulness_ratio'] = (
+            self.new_user['user_id']
+            .map(review_helpfulness_ratio_map)
+            .fillna(0)
+        )
+
+        return self
+
+    def add_binge_day_ratio(self):
+        # -------------------------------------------------
+        # binge_day_ratio 만들기
+        #
+        # 정의:
+        # user별 시청일 중
+        # "하루 총 시청시간 >= 180분" 인 날짜의 비율 * 100
+        #
+        # 예:
+        # 시청한 날짜 10일 중 2일이 180분 이상이면
+        # binge_day_ratio = 20
+        #
+        # 결측 처리:
+        # - watch_duration_minutes가 없는 행은 NaN 처리
+        # - 유효한 시청 날짜가 하나도 없는 user는 최종 0으로 채움
+        # -------------------------------------------------
+
+        # 1. 필요한 컬럼만 복사
+        watch_tmp = self.watch[['user_id', 'watch_date', 'watch_duration_minutes']].copy()
+
+        # 2. 날짜형 / 숫자형 변환
+        watch_tmp['watch_date'] = pd.to_datetime(
+            watch_tmp['watch_date'],
+            errors='coerce'
+        )
+        watch_tmp['watch_duration_minutes'] = pd.to_numeric(
+            watch_tmp['watch_duration_minutes'],
+            errors='coerce'
+        )
+
+        # 3. 날짜에서 시간 제거
+        # 하루 단위로 묶을 것이므로 normalize 사용
+        watch_tmp['watch_date'] = watch_tmp['watch_date'].dt.normalize()
+
+        # 4. user별 / 날짜별 총 시청시간 계산
+        # 모든 값이 NaN인 날은 NaN 유지
+        daily_watch_minutes = (
+            watch_tmp.groupby(['user_id', 'watch_date'], as_index=False)
+            .agg(
+                daily_watch_minutes=(
+                    'watch_duration_minutes',
+                    lambda x: x.sum(min_count=1)
+                )
+            )
+        )
+
+        # 5. 유효한 시청시간이 있는 날짜만 사용
+        daily_watch_minutes = daily_watch_minutes.dropna(subset=['daily_watch_minutes']).copy()
+
+        # 6. binge 여부 계산
+        # 하루 총 시청시간이 180분 이상이면 1, 아니면 0
+        daily_watch_minutes['is_binge_day'] = (
+            daily_watch_minutes['daily_watch_minutes'] >= 180
+        ).astype(int)
+
+        # 7. user별 binge day 비율 계산
+        binge_day_ratio_map = (
+            daily_watch_minutes.groupby('user_id')['is_binge_day']
+            .mean()
+            .mul(100)
+            .to_dict()
+        )
+
+        # 8. new_user에 컬럼 추가
+        # 유효한 시청 날짜가 하나도 없는 user는 0으로 채움
+        self.new_user['binge_day_ratio'] = (
+            self.new_user['user_id']
+            .map(binge_day_ratio_map)
+            .fillna(0)
+        )
+
+        return self
+
+    def add_avg_search_duration_seconds(self):
+        # -------------------------------------------------
+        # avg_search_duration_seconds 만들기
+        #
+        # 정의:
+        # user별 평균 검색 시간(초)
+        #
+        # 결측 처리:
+        # - search_duration_seconds가 숫자가 아니면 NaN
+        # - 유효한 검색 시간이 하나도 없는 user는 최종 0으로 채움
+        # -------------------------------------------------
+
+        # 1. 필요한 컬럼만 복사
+        search_tmp = self.search_logs[['user_id', 'search_duration_seconds']].copy()
+
+        # 2. 숫자형 변환
+        search_tmp['search_duration_seconds'] = pd.to_numeric(
+            search_tmp['search_duration_seconds'],
+            errors='coerce'
+        )
+
+        # 3. user별 평균 검색 시간 계산
+        avg_search_duration_seconds_map = (
+            search_tmp.groupby('user_id')['search_duration_seconds']
+            .mean()
+            .to_dict()
+        )
+
+        # 4. new_user에 컬럼 추가
+        # 검색 로그가 전혀 없는 user는 0으로 채움
+        self.new_user['avg_search_duration_seconds'] = (
+            self.new_user['user_id']
+            .map(avg_search_duration_seconds_map)
+            .fillna(0)
+        )
+
+        return self
 
     def get_data(self):
         return self.new_user.copy()
