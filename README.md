@@ -154,23 +154,47 @@
 
 ---
 
-## 코드 모듈 구조 (System Architecture)
+## 프로젝트 폴더 구조 (System Architecture)
 
-전체 파이프라인을 기능별 모듈로 분리하여 코드 가독성과 재사용성을 극대화.
+전체 폴더 구조에 대한 설명입니다. 
 
 ```text
 프로젝트 구조
-├── model_netflix.py           # 메인 실행 파일 (Pipeline Control)
-├── Data_Preprocessing/        # 전처리 모듈
-│   ├── load_data.py           # 데이터 로드 및 피처 생성
-│   ├── cleaning.py            # 결측치 보정 로직
-│   └── encoding.py            # 범주형 변수 One-Hot 인코딩
-├── Modeling/                  # 분석 모듈
-│   ├── Model_test.py          # 알고리즘 비교 학습
-│   └── save_model.py          # 최적 모델 저장
-└── Display_graph/             # 시각화 모듈
-    └── cm_fi_graph.py         # Confusion Matrix 및 중요도 시각화
+├── main.py                    # 앱 진입점
+├── requirements.txt
+├── docker-compose.yml
+├── .env.example
+├── models/                    # ML 파이프라인
+│   ├── model_netflix.py       # 메인 실행 (Pipeline Control)
+│   ├── simul_netflex.py       # 시뮬레이터 연동 스크립트
+│   ├── test.py                # 테스트·실험용
+│   ├── utils.py               # 공통 유틸
+│   ├── model_mjk.ipynb        # 모델 실험 노트북
+│   ├── Data_Preprocessing/    # 전처리
+│   │   ├── load_data.py       # 데이터 로드·피처 생성
+│   │   ├── cleaning.py        # 결측치 보정
+│   │   ├── encoding.py        # 범주형 인코딩 등
+│   │   ├── data_split.py      # 학습/검증 등 분할
+│   │   ├── merge_data.py      # 데이터 병합
+│   │   └── outlier_handling.py # 이상치 처리
+│   ├── Modeling/              # 모델 학습·저장
+│   │   ├── Model_test.py      # 알고리즘 비교 학습
+│   │   ├── save_model.py      # 최적 모델 저장
+│   │   └── check.py           # 검증·점검
+│   ├── Display_graph/         # 시각화
+│   │   ├── cm_fi_graph.py     # Confusion Matrix·피처 중요도
+│   │   └── ac_ls_graph.py     # 추가 그래프
+│   ├── Netflix_ML/            # 팀원별 노트북·EDA·중간 CSV·이미지
+│   └── data/                  # 학습용 CSV/JSON·제출·결과·README
+├── src/                       # Streamlit 대시보드·분석 UI (screens, components, design, config, utils)
+├── backend/                   # Dockerfile, extract_data.py, requirements
+├── data/                      # DB_QUERY_GUIDE, db_query.py, sample·server CSV, model_netflix.pkl
+├── scripts/                   # CSV·시뮬레이터 샘플·검증 등 배치 스크립트
+├── docs/                      # 기획·작업 이력·가이드 문서
+├── catboost_info/             # CatBoost 학습 로그(실행 시 생성·추적)
+└── .github/                   # 이슈 템플릿
 ```
+
 
 
 ### 5. 예측
@@ -250,7 +274,11 @@
 <hr>
 <blockquote>
 
-•	김경수 :  <br><br>
+•	김경수 :  
+1. 다른 비전공자 분들하고 함께하고 싶어서 프로젝트 초반에 계획을 세운건 좋았지만 그러다 보니 전공자 분들에게 도움이 되는 프로젝트는 아니었던 것 같습니다. 
+2. 머신러닝 쪽에 집중해 주셨으면 해서 제가 UI를 맞은것 까지는 좋았지만 작업 후반에는 UI 구현 쪽 일에 매몰되다 보니 팀원들을 챙기지 못했던게 아닌가 합니다. (다행히 재경님이 도와 주셔서 그나마 무사하게 넘어갔습니다. )
+3. 혼자서 UI 개발을 진행하는데 코딩을 100% 할 수 있는 능력은 되지 않아서 LLM 에 많이 의존했습니다. 아예 활용을 안하는건 불가능하겠지만 개인 실력을 높히는 방향으로 사용할 수 있는 방법이 어떤게 있는지 고민해 봐야 할 것 같습니다. (ex - 작업 과정을 계획을 세우고 기록하게 해서 작업전 / 작업후에 리뷰하거나 작업된 내용이 이해되지 않으면 이해할 수 있는 방식으로 구현될 때까지 다시 개발시키고 방향을 제시하거나 등...)
+4. 최대한 개발 / 모델링 시간을 확보해 드리고 싶어서 문서 작업이나 기획서 업무들을 가져와서 처리했는데 이렇게 하다보니 다른 분들이 해당 업무를 경험해볼 기회를 뺏은게 아닌가 생각이 들었습니다. 다음 번에는 팀원들이 다른 팀장님 밑에서 해당 업무들을 경험해 보셨으면 좋겠습니다. <br><br>
 •	김주영 :  팀장님께서 잘 끌어주시고 머신러닝과 일주일동안 친해진 시간이어서 좋았습니다. 실행이 되는 베이스 모델을 구축했다는 점, 6개의 csv 파일에서 직접 피처 10개를 생성했다는 점, 결측치를 처리했다는 점, 클래스 불균형이 있을때에는 SMOTE 혹은 언더/오버샘플링을 해야한다는 점을 깨달았습니다. 완벽히는 못했지만 스스로 할 줄 아는 것과 모르는 것을 확실하게 알 수 있는 좋은 기회였습니다. 데이터 전처리 작업의 중요성을 알게된 값진 시간이었습니다. 이후에는 깨달은 점을 반영하여 데이터 전처리와 이상치 및 결측치 처리에 대해 좀 더 신중하고 근거있는 처리하도록 하겠습니다.<br><br>
 •	문재경 :  <br><br>
 •	이성진 :  모델의 성능은 알고리즘보다 데이터의 균형과 상태에 더 큰 영향을 받는다는 점을 배웠습니다. 
