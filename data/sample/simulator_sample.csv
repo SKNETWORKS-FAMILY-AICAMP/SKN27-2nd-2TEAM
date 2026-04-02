@@ -1,6 +1,6 @@
-segment_name,segment_size,subscription_type,primary_device,household_size
-프리미엄_가입군 (기준: 요금제 Premium 또는 Premium+),3828,Premium,Desktop,2.4
-모바일_주사용군 (기준: 주기기 Mobile),729,Standard,Mobile,2.4
-다인가구군 (기준: 가구원 수 3명 이상),1668,Standard,Desktop,4.1
-장기가입군 (기준: 2023년 이전 가입),1021,Standard,Laptop,1.2
-일반_안정군 (기준: 다른 세그먼트에 해당하지 않는 기본군),1233,Standard,Laptop,1.2
+segment_name,segment_size,subscription_plan,primary_device,household_size
+프리미엄_가입군 (우선순위1: 요금제 Premium 또는 Premium+),3828,Premium,Desktop,2.0
+모바일_주사용군 (우선순위2: 1번 제외 · 주기기 Mobile),729,Standard,Mobile,2.0
+다인가구군 (우선순위3: 1~2번 제외 · 가구원 3명 이상),1668,Standard,Desktop,4.0
+장기가입군 (우선순위4: 1~3번 제외 · 가입연도 start_year≤2023),1021,Standard,Laptop,1.0
+일반_안정군 (우선순위5: 위 1~4 해당 없음),1233,Standard,Laptop,1.0

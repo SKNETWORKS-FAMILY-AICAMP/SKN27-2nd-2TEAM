@@ -2,18 +2,19 @@
 분석 화면 우열 결과 패널.
 
 - Current vs Simulated KPI 카드 (`ui_config.analysis.compare_cards`)
-- 세그먼트 사용자별 예측 확률 히스토그램 + `st.bar_chart` (`churn_compare_chart`)
+- 연령 구간별 모델 예측 이탈 인원 막대 그래프 (`churn_compare_chart`, proba 기준)
 - AI 요약 카드 (`analysis.ai_comment`)
 """
 
 from __future__ import annotations
 
-import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
 import streamlit as st
 
 from src.design import markup
 from src.design.common import COLORS
-from src.utils.churn_histogram import build_churn_compare_histogram
+from src.utils.analysis_comparison_boxplot import make_churn_comparison_boxplot_figure
 
 
 def _build_delta_view_model(current_prob: float, projected_prob: float) -> dict:
@@ -60,20 +61,31 @@ def _render_kpi_compare_row(
         )
 
 
-def _render_histogram_section(
+def _render_comparison_chart_section(
     *,
-    current_probs_pct: np.ndarray,
-    projected_probs_pct: np.ndarray,
+    chart_df: pd.DataFrame,
     chart_copy: dict,
-    histogram_height: int,
+    chart_height_px: int,
 ) -> None:
-    """Current/Simulated 히스토그램 섹션."""
-    df_hist = build_churn_compare_histogram(current_probs_pct, projected_probs_pct)
+    """연령 구간별 모델 예측 이탈(proba) 인원 수(막대 2색)."""
+    title = chart_copy["title"]
+    caption = chart_copy.get("caption", "")
+    x_label = chart_copy["x_label"]
+
+    fig = make_churn_comparison_boxplot_figure(
+        chart_df,
+        legend_current=chart_copy["legend_current"],
+        legend_simulated=chart_copy["legend_simulated"],
+        x_label=x_label,
+        y_label=chart_copy["y_label"],
+        chart_height_px=chart_height_px,
+    )
     with st.container(border=True):
-        st.markdown(f"**{chart_copy['title']}**")
-        if chart_copy.get("caption"):
-            st.caption(chart_copy["caption"])
-        st.bar_chart(df_hist, height=histogram_height)
+        st.markdown(f"**{title}**")
+        if caption:
+            st.caption(caption)
+        st.pyplot(fig, use_container_width=True)
+    plt.close(fig)
 
 
 def _render_ai_summary_section(
@@ -103,8 +115,7 @@ def render_analysis_outcomes(
     *,
     base_churn_prob: float,
     projected_prob: float,
-    current_probs_pct: np.ndarray,
-    projected_probs_pct: np.ndarray,
+    chart_df: pd.DataFrame,
     selected_segment_name: str,
     compare_cfg: dict,
     chart_copy: dict,
@@ -112,8 +123,7 @@ def render_analysis_outcomes(
     layout_cfg: dict,
     thresholds_cfg: dict,
 ) -> None:
-    """우측 열 전체: 스페이서, KPI 2칸, 히스토그램, AI 요약."""
-    # 레이아웃 간격/차트 높이/임계값은 모두 설정(ui_config)에서 주입받아 사용.
+    """우측 열 전체: 스페이서, KPI 2칸, 박스플롯, AI 요약."""
     st.html(markup.spacer_height(layout_cfg["results_top_spacer"]))
     delta_vm = _build_delta_view_model(base_churn_prob, projected_prob)
     _render_kpi_compare_row(
@@ -123,11 +133,10 @@ def render_analysis_outcomes(
         delta_vm=delta_vm,
     )
     st.html(markup.spacer_height(layout_cfg["results_section_spacer"]))
-    _render_histogram_section(
-        current_probs_pct=current_probs_pct,
-        projected_probs_pct=projected_probs_pct,
+    _render_comparison_chart_section(
+        chart_df=chart_df,
         chart_copy=chart_copy,
-        histogram_height=layout_cfg["histogram_height"],
+        chart_height_px=int(layout_cfg["histogram_height"]),
     )
     st.html(markup.spacer_height(layout_cfg["results_section_spacer"]))
     _render_ai_summary_section(

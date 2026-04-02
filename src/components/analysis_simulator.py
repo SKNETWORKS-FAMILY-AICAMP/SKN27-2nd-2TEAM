@@ -20,9 +20,10 @@ class SimulatorFormState:
     """폼 제출 여부와 위젯 값."""
 
     submit: bool
-    subscription_type: str
+    subscription_plan: str
     primary_device: str
     household_size: float | None  # 변경하지 않으면 None
+    monthly_spend_percent_of_baseline: float  # 원 지출 대비 %, 100=유지, 50~150
 
 
 def _resolve_default_index(value: str, options: list[str]) -> int:
@@ -34,14 +35,13 @@ def _render_subscription_fields(
     selected_row: pd.Series,
     form_config: dict,
 ) -> tuple[str, str]:
-    """요금제 및 주기기 입력 위젯을 렌더링하고 값을 반환합니다."""
-    # 요금제
-    sub_options = form_config["subscription_type_options"]
-    sub_default = str(selected_row.get("subscription_type", "dontcare"))
+    """요금제(subscription_plan) 및 주기기 입력 위젯을 렌더링하고 값을 반환합니다."""
+    sub_options = form_config["subscription_plan_options"]
+    sub_default = str(selected_row.get("subscription_plan", "dontcare"))
     sub_index = _resolve_default_index(sub_default, sub_options)
-    
-    subscription_type = st.selectbox(
-        form_config["subscription_type_label"],
+
+    subscription_plan = st.selectbox(
+        form_config["subscription_plan_label"],
         sub_options,
         index=sub_index,
     )
@@ -57,7 +57,7 @@ def _render_subscription_fields(
         index=dev_index,
     )
     
-    return subscription_type, primary_device
+    return subscription_plan, primary_device
 
 
 def _render_behavior_fields(selected_row: pd.Series, form_config: dict) -> float | None:
@@ -83,11 +83,26 @@ def _render_behavior_fields(selected_row: pd.Series, form_config: dict) -> float
     return float(household_size)
 
 
+def _render_monthly_spend_pct_field(form_config: dict) -> float:
+    """월 지출: 중앙 100%=원값, 50~150% 슬라이더."""
+    return float(
+        st.slider(
+            form_config["monthly_spend_pct_label"],
+            min_value=float(form_config["monthly_spend_pct_min"]),
+            max_value=float(form_config["monthly_spend_pct_max"]),
+            value=float(form_config["monthly_spend_pct_default"]),
+            step=float(form_config.get("monthly_spend_pct_step", 1)),
+            help=form_config.get("monthly_spend_pct_help", ""),
+        )
+    )
+
+
 def _read_form_payload(selected_row: pd.Series, form_config: dict) -> SimulatorFormState:
     """폼 내부 위젯 값을 수집해 SimulatorFormState로 묶습니다."""
-    subscription_type, primary_device = _render_subscription_fields(selected_row, form_config)
+    subscription_plan, primary_device = _render_subscription_fields(selected_row, form_config)
     household_size = _render_behavior_fields(selected_row, form_config)
-    
+    monthly_spend_pct = _render_monthly_spend_pct_field(form_config)
+
     st.html(markup.spacer_height("1rem"))
     submit_button = st.form_submit_button(
         label=form_config["button_label"],
@@ -97,9 +112,10 @@ def _read_form_payload(selected_row: pd.Series, form_config: dict) -> SimulatorF
     
     return SimulatorFormState(
         submit=submit_button,
-        subscription_type=subscription_type,
+        subscription_plan=subscription_plan,
         primary_device=primary_device,
         household_size=household_size,
+        monthly_spend_percent_of_baseline=monthly_spend_pct,
     )
 
 

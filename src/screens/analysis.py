@@ -52,8 +52,7 @@ def _render_analysis_results(
     col,
     base_churn_prob: float,
     projected_prob: float,
-    current_probs_pct,
-    projected_probs_pct,
+    chart_df,
     selected_segment_name: str,
     page_cfg: dict,
 ) -> None:
@@ -62,8 +61,7 @@ def _render_analysis_results(
         render_analysis_outcomes(
             base_churn_prob=base_churn_prob,
             projected_prob=projected_prob,
-            current_probs_pct=current_probs_pct,
-            projected_probs_pct=projected_probs_pct,
+            chart_df=chart_df,
             selected_segment_name=selected_segment_name,
             compare_cfg=page_cfg["compare_cards"],
             chart_copy=page_cfg["chart_copy"],
@@ -106,14 +104,15 @@ def render_analysis():
         form_state = render_simulator_form(selected_row, form_config)
 
     try:
-        current_prob, projected_prob, _, cur_probs, proj_probs = (
+        current_prob, projected_prob, _, _, _, chart_df = (
             infer_segment_current_and_projected_prob(
                 users_df,
                 selected_segment_name=selected_segment_name,
                 submitted=form_state.submit,
-                subscription_type=form_state.subscription_type,
+                subscription_plan=form_state.subscription_plan,
                 primary_device=form_state.primary_device,
                 household_size=form_state.household_size,
+                monthly_spend_percent_of_baseline=form_state.monthly_spend_percent_of_baseline,
             )
         )
     except Exception as exc:
@@ -124,8 +123,7 @@ def render_analysis():
         col=col2,
         base_churn_prob=current_prob,
         projected_prob=projected_prob,
-        current_probs_pct=cur_probs,
-        projected_probs_pct=proj_probs,
+        chart_df=chart_df,
         selected_segment_name=selected_segment_name,
         page_cfg=page_cfg,
     )

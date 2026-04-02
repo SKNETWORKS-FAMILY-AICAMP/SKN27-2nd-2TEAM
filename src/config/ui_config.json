@@ -81,17 +81,23 @@
     },
     "customer_selection": {
       "label": "분석할 고객/세그먼트 선택",
-      "help": "예측 대상이 되는 사용자 그룹을 선택하세요."
+      "help": "예측 대상이 되는 사용자 그룹을 선택하세요. 세그먼트는 요금제·기기·가구원·가입연도 순 우선순위(np.select)로 한 라벨만 부여됩니다."
     },
     "form": {
       "title": "파라미터 조정",
       "section_icon": "tune",
-      "subscription_type_label": "요금제 유형",
-      "subscription_type_options": ["dontcare", "Basic", "Standard", "Premium", "Premium+"],
+      "subscription_plan_label": "요금제 (subscription_plan)",
+      "subscription_plan_options": ["dontcare", "Basic", "Standard", "Premium", "Premium+"],
       "primary_device_label": "주 사용 기기",
       "primary_device_options": ["dontcare", "Laptop", "Desktop", "Gaming Console", "Tablet", "Mobile", "Smart TV"],
       "household_size_use_label": "가구원 수 변경하기",
       "household_size_label": "가구원 수 (명)",
+      "monthly_spend_pct_label": "월 지출 (원래 대비 %)",
+      "monthly_spend_pct_help": "100%가 각 고객의 원래 월 지출입니다. 왼쪽 최대 −50%(50%), 오른쪽 최대 +50%(150%)까지 조정합니다.",
+      "monthly_spend_pct_min": 50,
+      "monthly_spend_pct_max": 150,
+      "monthly_spend_pct_default": 100,
+      "monthly_spend_pct_step": 1,
       "button_label": "시뮬레이션 실행",
       "household_size_max": 8,
       "household_size_step": 1
@@ -137,8 +143,12 @@
       "summary_template": "선택하신 <strong>{segment}</strong> 세그먼트에 대해 조정된 파라미터로 분석한 결과, 이탈율이 <strong>{projected}</strong> 로 예측됩니다."
     },
     "churn_compare_chart": {
-      "title": "이탈률 분포 비교 (Current vs Simulated)",
-      "caption": "선택 세그먼트 기준(현재)과 시뮬레이션 결과를 동일 구간에서 빈도로 비교한 참고용 차트입니다."
+      "title": "연령 구간별 예측 이탈 인원 (현재 vs 시뮬)",
+      "caption": "",
+      "x_label": "연령 구간",
+      "y_label": "예측 이탈 인원 (명)",
+      "legend_current": "현재",
+      "legend_simulated": "시뮬레이션"
     }
   }
 }
