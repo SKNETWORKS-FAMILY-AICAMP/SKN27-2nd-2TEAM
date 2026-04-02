@@ -8,9 +8,9 @@
 ## 팀 소개
 
 **팀명: 2조**
-
-| **김경수 (팀장)** | **김주영** | **문재경** | **이성진** | **이재강** | **이재건** |
+|![title](https://i.namu.wiki/i/EXUFV0Tuo0cLyoVpeGuFe-h6azQ92PWnT4uGLMgaT9rq0_cLEtXTNHwPrQlGO95CmS2p7Kha0_JZfuiLth0LF3cuEYrOtXeYHx5oKBvpiiXlovpq6gdNPVCGLZY-jauHab6SZNfspKLfi41-4pt6rw.webp)|![title](https://i.namu.wiki/i/ys-84JzsMzI14JysdBiTVoE-KISPvw5XxZvoapBEPsDrgnDfUsRiuLBt_CvlvbgYn-5By7p5kmlwBxUxr61Mvk5TpzpFMxtWst5IEcypDVrezIkd7EpA3zVztFkx2C90pW2pbpP1_2W98Wh0m3km3w.webp)|![title](https://i.namu.wiki/i/7hBaLlK5N0Y-ucvkzGzaoJ62jfGkeuw7YUp2BC5c2ohVtk3lrws3sMu4t74Uoqo8alfO3jQzIGpfLZTQjAmTwHDW-xBc52KwAjrknLz849jCG4GwfxtzTYGVARqdUiL4_fD6G4F9YbOQdBVSNWdinA.webp)|![title](https://i.namu.wiki/i/50kcgE_FPjKqBakTzT27J7gDH1EK6Yws9qOAP6tHXYXBmeJlqw5S4crlHDua-GhDdfvX6KGfmb6aY9NvtdkhwvS5Fpk-BrkO8EB4xxSmnYqjDvs7kqqXt_feZXdzyR9I_6zV1dlRoEmbv-UVSgRxxA.webp)|![title](https://i.namu.wiki/i/nk7nENfy3WH03XgdEuokWEwr4O7uUlP1A2SLmRE5zoFNCOiDBRZJXsW-xe3cuSZLFujpGrbv8-exsnyer3RlzVrJZe7IBXuXubdSkIcOP6ZIHnpRq4y5Gt0mXqZfF-6c9DHpPjUtEXS7YxLoYakQIA.webp)|![title](https://i.namu.wiki/i/JcP5JyejZmiSzJFFu9a3VnwAViYqyuaukpcW4Ixk-Od90MVCCBfXxt4uU88uJ0Cn9Az5kNLDK8G6QDHeab61H7ZSFR0llJ74EiiFc75QPsp5Og8HtQiSxYvXWFTeE5LwtYhycNwCEcbiV-JKCB8euw.webp)|
 |:---:|:---:|:---:|:---:|:---:|:---:|
+| **김경수 (팀장)** | **김주영** | **문재경** | **이성진** | **이재강** | **이재건** |
 | UI, 스트림릿 구현 | 데이터 전처리 | 모델링 및 검증 | 베이스 모델 | 데이터 전처리 | 모델링 및 검증 |
 
 ---
