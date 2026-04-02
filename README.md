@@ -213,6 +213,9 @@
 
 ### 7. Streamlit 예측 시각화
 </blockquote>
+<img width="600" height="400" alt="image" src="https://github.com/user-attachments/assets/e907083f-c69a-477a-98d8-4066d9b8fa56" />
+<img width="600" height="400" alt="image" src="https://github.com/user-attachments/assets/4378d15b-9746-425e-9fc5-4250654b891e" />
+
 ---
 
 ### 8. 한계점 및 향후 개선 방향
