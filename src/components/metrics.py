@@ -1,12 +1,12 @@
 """
 대시보드 상단 KPI 카드 행.
 
-- `dashboard_metrics.csv`를 로드해 4개 카드를 가로로 배치
+- `netflix_user_sample.csv` 기반 집계 결과를 로드해 4개 카드를 가로로 배치
 - `markup.metric_card_html` + 디자인 시스템의 `.metric-card` 스타일 사용
 """
 import streamlit as st
 from src.design import markup
-from src.utils.data_loader import load_metrics_data
+from src.utils.data_loader import load_metrics_data, load_ui_config
 
 
 def render_metric_card(icon_name, icon_style_class, title, value, change_text, is_positive=True, emoji=""):
@@ -39,10 +39,14 @@ def render_metrics_row():
     """
     상단 4개의 KPI 지표 카드를 나란히 렌더링합니다.
     """
+    # KPI 행 레이아웃(컬럼 수)은 설정 파일에서 주입받아 고정값 의존을 줄입니다.
+    ui_config = load_ui_config()
+    columns_count = int(ui_config["dashboard"]["kpi_layout"]["columns"])
+    # KPI 카드 데이터(값/증감/긍부정)는 data_loader에서 계산 완료된 상태로 전달됩니다.
     metrics_data = load_metrics_data()
-    cols = st.columns(4)
+    cols = st.columns(columns_count)
 
-    for i, metric in enumerate(metrics_data[:4]):
+    for i, metric in enumerate(metrics_data[:columns_count]):
         with cols[i]:
             render_metric_card(
                 icon_name=metric["icon_name"],

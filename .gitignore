@@ -40,10 +40,9 @@ venv.bak/
 # ----------------------------------------------------------------------
 # 실제 데이터 유출 방지를 위해 csv 파일 제외
 data/**/*.csv
-# 테스트/뼈대 샘플은 깃에 포함하려면 아래 주석 해제 (팀원과 상의)
-!data/sample/sample_segment.csv
-!data/server/segment_output.csv
-!data/sample/*.csv
+# data/sample, data/server는 제외하지 않도록 예외 처리
+!data/sample/**
+!data/server/**
 *.xlsx
 *.xls
 *.db

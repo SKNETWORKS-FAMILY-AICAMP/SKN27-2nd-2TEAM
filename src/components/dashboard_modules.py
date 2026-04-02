@@ -11,10 +11,12 @@ from src.utils.data_loader import load_dashboard_modules_data
 
 def render_dashboard_modules():
     """대시보드 하단 3개 모듈 (플랜 분포, 이탈 사유, 최근 세션) 렌더링"""
+    # 하단 3모듈 데이터는 JSON 단일 소스에서 읽어 동일한 카드 패턴으로 출력합니다.
     data = load_dashboard_modules_data()
 
     st.html(markup.spacer_std())
 
+    # 3열 고정 레이아웃(좌:플랜, 중:이탈 사유, 우:최근 세션).
     col1, col2, col3 = st.columns(3, gap="medium")
 
     with col1:
