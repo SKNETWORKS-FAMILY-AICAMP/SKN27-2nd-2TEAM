@@ -1,4 +1,4 @@
-<img width="1024" height="683" alt="image" src="https://github.com/user-attachments/assets/ec91ae50-1703-4fca-8e7a-e51c12f1e715" /># 🎬 SKN27-2ND-2TEAM 프로젝트
+# 🎬 SKN27-2ND-2TEAM 프로젝트
 
 ### 2차 프로젝트: 넷플릭스 고객 이탈 분석 및 예측
 **개발 기간:** 2026.03.25 - 2026.04.02
