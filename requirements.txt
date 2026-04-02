@@ -8,6 +8,12 @@ numpy==2.4.3
 # 모델 학습용 라이브러리
 scikit-learn==1.8.0
 matplotlib==3.10.8
+koreanize-matplotlib==0.1.1
 seaborn==0.13.2
 torch
 easydict
+
+# 모델 라이브러리
+xgboost==3.2.0
+lightgbm==4.6.0
+catboost==1.2.10

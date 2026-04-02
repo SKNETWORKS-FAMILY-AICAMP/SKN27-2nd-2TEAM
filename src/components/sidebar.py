@@ -14,6 +14,7 @@ def render_sidebar():
     사이드바 메뉴와 하단 프로필을 렌더링합니다.
     Streamlit의 st.sidebar 컨텍스트 내에서 호출되어야 합니다.
     """
+    # 사이드바 문구/메뉴 라벨은 설정 파일에서 가져옵니다.
     ui_config = load_ui_config()
     sidebar_config = ui_config["sidebar"]
 
@@ -21,6 +22,7 @@ def render_sidebar():
         markup.sidebar_header(sidebar_config["title"], sidebar_config["subtitle"])
     )
 
+    # 최초 진입 시 기본 라우트(Home)로 세션 상태를 초기화합니다.
     if "current_page" not in st.session_state:
         st.session_state.current_page = "Home"
 
@@ -29,6 +31,7 @@ def render_sidebar():
 
     display_options = [menu_labels[opt] for opt in menu_options]
 
+    # 현재 페이지 키를 라디오 표시 문자열로 변환해 초기 선택값으로 사용합니다.
     current_idx = menu_options.index(st.session_state.current_page)
     initial_display = display_options[current_idx]
 
@@ -42,6 +45,7 @@ def render_sidebar():
         label_visibility="collapsed",
     )
 
+    # 선택된 라디오 값을 다시 페이지 키로 역매핑해 main 라우팅과 동기화합니다.
     selected_display = st.session_state.nav_radio
     for key, val in menu_labels.items():
         if val == selected_display:

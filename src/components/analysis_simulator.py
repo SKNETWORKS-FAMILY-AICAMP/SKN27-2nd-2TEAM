@@ -1,8 +1,7 @@
 """
-분석(이탈 시뮬레이터) 화면 좌열 및 예측 휴리스틱.
+분석(이탈 시뮬레이터) 화면 좌열 입력 폼.
 
 - `render_simulator_form`: `ui_config.analysis.form` 기반 `st.form` (키 `simulator_form` 유지)
-- `project_churn_probability`: 제출 시 요금제·시청·문의 변화를 반영한 표시용 이탈률(%)
 - `SimulatorFormState`: 폼 위젯 값과 제출 여부를 우열 간 전달할 때 사용
 """
 
@@ -18,47 +17,106 @@ from src.design import markup
 
 @dataclass
 class SimulatorFormState:
-    """폼 제출 여부와 위젯 값 (월 청구액은 현재 휴리스틱에 미반영)."""
+    """폼 제출 여부와 위젯 값."""
 
     submit: bool
-    subscription_type: str
-    monthly_revenue: float
-    viewing_hours: float
-    support_calls: int
+    subscription_plan: str
+    primary_device: str
+    household_size: float | None  # 변경하지 않으면 None
+    monthly_spend_percent_of_baseline: float  # 원 지출 대비 %, 100=유지, 50~150
 
 
-def project_churn_probability(
-    base_churn_prob: float,
+def _resolve_default_index(value: str, options: list[str]) -> int:
+    """값을 options의 인덱스로 변환해 selectbox 초기값으로 사용합니다."""
+    return options.index(value) if value in options else 0
+
+
+def _render_subscription_fields(
     selected_row: pd.Series,
-    *,
-    submitted: bool,
-    subscription_type: str,
-    viewing_hours: float,
-    support_calls: int,
-) -> float:
-    """제출 시 파라미터 변화를 반영한 예측 이탈률(%). 미제출이면 베이스값 그대로."""
-    if not submitted:
-        return float(base_churn_prob)
+    form_config: dict,
+) -> tuple[str, str]:
+    """요금제(subscription_plan) 및 주기기 입력 위젯을 렌더링하고 값을 반환합니다."""
+    sub_options = form_config["subscription_plan_options"]
+    sub_default = str(selected_row.get("subscription_plan", "dontcare"))
+    sub_index = _resolve_default_index(sub_default, sub_options)
 
-    def_sub_type = selected_row["subscription_type"]
-    calc_prob = float(base_churn_prob)
+    subscription_plan = st.selectbox(
+        form_config["subscription_plan_label"],
+        sub_options,
+        index=sub_index,
+    )
+    
+    # 주기기
+    dev_options = form_config.get("primary_device_options", ["dontcare"])
+    dev_default = str(selected_row.get("primary_device", "dontcare"))
+    dev_index = _resolve_default_index(dev_default, dev_options)
+    
+    primary_device = st.selectbox(
+        form_config.get("primary_device_label", "주 사용 기기"),
+        dev_options,
+        index=dev_index,
+    )
+    
+    return subscription_plan, primary_device
 
-    if def_sub_type != subscription_type:
-        if subscription_type == "Premium":
-            calc_prob -= 3.0
-        elif subscription_type == "Basic":
-            calc_prob += 5.0
-        else:
-            calc_prob += 1.0
 
-    hours_diff = viewing_hours - float(selected_row["viewing_hours"])
-    calc_prob -= hours_diff / 10.0
+def _render_behavior_fields(selected_row: pd.Series, form_config: dict) -> float | None:
+    """가구원 수 슬라이더를 렌더링하고 값을 반환합니다. (체크박스로 활성화)"""
+    use_household_size = st.checkbox(
+        form_config.get("household_size_use_label", "가구원 수 변경하기"),
+        value=False,
+    )
+    
+    default_hh = float(selected_row.get("household_size", 0.0))
+    
+    household_size = st.slider(
+        form_config.get("household_size_label", "가구원 수 (명)"),
+        min_value=0.0,
+        max_value=float(form_config.get("household_size_max", 8)),
+        value=default_hh,
+        step=float(form_config.get("household_size_step", 1.0)),
+        disabled=not use_household_size,
+    )
+    
+    if not use_household_size:
+        return None
+    return float(household_size)
 
-    calls_diff = support_calls - int(selected_row["customer_support_calls"])
-    calc_prob += calls_diff * 5.0
 
-    calc_prob = max(1.0, min(99.0, calc_prob))
-    return round(calc_prob, 1)
+def _render_monthly_spend_pct_field(form_config: dict) -> float:
+    """월 지출: 중앙 100%=원값, 50~150% 슬라이더."""
+    return float(
+        st.slider(
+            form_config["monthly_spend_pct_label"],
+            min_value=float(form_config["monthly_spend_pct_min"]),
+            max_value=float(form_config["monthly_spend_pct_max"]),
+            value=float(form_config["monthly_spend_pct_default"]),
+            step=float(form_config.get("monthly_spend_pct_step", 1)),
+            help=form_config.get("monthly_spend_pct_help", ""),
+        )
+    )
+
+
+def _read_form_payload(selected_row: pd.Series, form_config: dict) -> SimulatorFormState:
+    """폼 내부 위젯 값을 수집해 SimulatorFormState로 묶습니다."""
+    subscription_plan, primary_device = _render_subscription_fields(selected_row, form_config)
+    household_size = _render_behavior_fields(selected_row, form_config)
+    monthly_spend_pct = _render_monthly_spend_pct_field(form_config)
+
+    st.html(markup.spacer_height("1rem"))
+    submit_button = st.form_submit_button(
+        label=form_config["button_label"],
+        type="primary",
+        use_container_width=True,
+    )
+    
+    return SimulatorFormState(
+        submit=submit_button,
+        subscription_plan=subscription_plan,
+        primary_device=primary_device,
+        household_size=household_size,
+        monthly_spend_percent_of_baseline=monthly_spend_pct,
+    )
 
 
 def render_simulator_form(selected_row: pd.Series, form_config: dict) -> SimulatorFormState:
@@ -69,55 +127,5 @@ def render_simulator_form(selected_row: pd.Series, form_config: dict) -> Simulat
             form_config["title"],
         )
     )
-
     with st.form("simulator_form"):
-        def_sub_type = selected_row["subscription_type"]
-        sub_idx = (
-            form_config["subscription_type_options"].index(def_sub_type)
-            if def_sub_type in form_config["subscription_type_options"]
-            else 0
-        )
-
-        subscription_type = st.selectbox(
-            form_config["subscription_type_label"],
-            form_config["subscription_type_options"],
-            index=sub_idx,
-        )
-
-        monthly_revenue = st.number_input(
-            form_config["monthly_revenue_label"],
-            min_value=0.0,
-            value=float(selected_row["monthly_revenue"]),
-            step=1.0,
-        )
-
-        viewing_hours = st.slider(
-            form_config["viewing_hours_label"],
-            min_value=0.0,
-            max_value=200.0,
-            value=float(selected_row["viewing_hours"]),
-            step=0.5,
-        )
-
-        support_calls = st.slider(
-            form_config["customer_support_calls_label"],
-            min_value=0,
-            max_value=20,
-            value=int(selected_row["customer_support_calls"]),
-            step=1,
-        )
-
-        st.html(markup.spacer_height("1rem"))
-        submit_button = st.form_submit_button(
-            label=form_config["button_label"],
-            type="primary",
-            use_container_width=True,
-        )
-
-        return SimulatorFormState(
-            submit=submit_button,
-            subscription_type=subscription_type,
-            monthly_revenue=monthly_revenue,
-            viewing_hours=viewing_hours,
-            support_calls=support_calls,
-        )
+        return _read_form_payload(selected_row, form_config)

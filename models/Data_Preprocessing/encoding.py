@@ -9,8 +9,9 @@ from IPython.display import display
 def get_encode_cols(train: pd.DataFrame) -> tuple:
     """범주형 컬럼과 수치형 컬럼 분리하여 반환"""
 
-    enc_cols    = ['gender', 'subscription_plan', 'subscription_start_date', 'primary_device']
-    normal_cols = list(set(train.columns) - set(enc_cols))
+    enc_cols = ['gender', 'subscription_type', 'primary_device', 'country', 'favorite_genre']
+
+    normal_cols = list(set(train.columns) - set(enc_cols) - {'is_churned'})
 
     print(f'enc_cols    : {enc_cols}')
     print(f'normal_cols : {normal_cols}')
