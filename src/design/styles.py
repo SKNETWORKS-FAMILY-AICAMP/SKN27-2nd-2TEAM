@@ -3,12 +3,13 @@ from src.design.common import get_common_css, COLORS
 from src.design.sidebar import get_sidebar_css
 from src.design.metrics import get_metrics_css
 from src.design.charts import get_charts_css
-from src.utils.data_loader import load_ui_config
+from src.config.config import load_app_shell_config
 
 
 def apply_streamlit_page_config():
     """브라우저 탭 제목·아이콘·wide 레이아웃 등 앱 셸 설정 (`ui_config.app`)."""
-    cfg = load_ui_config().get("app") or {}
+    # 페이지 셸 설정은 ui_config.app을 기준으로 주입합니다.
+    cfg = load_app_shell_config()
     st.set_page_config(
         page_title=cfg.get("page_title", "Streamlit"),
         page_icon=cfg.get("page_icon"),
@@ -32,6 +33,7 @@ def inject_custom_css():
     # chart-header / chart-card
     charts_css = get_charts_css()
 
+    # CSS는 공통 -> 영역별 순서로 합쳐 캐스케이딩 충돌을 줄입니다.
     combined_css = f"""
     <style>
     {common_css}
