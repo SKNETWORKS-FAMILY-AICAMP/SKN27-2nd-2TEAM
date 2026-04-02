@@ -9,12 +9,11 @@
 
 ## 작업 내역
 1. **환경 설정 및 경로 모듈화 (`src/config.py`)**
-   - `data/sample` 디렉토리를 참조하도록 데이터 및 UI 설정 경로 추가 (`UI_CONFIG_PATH`, `METRICS_DATA_PATH`, `CHART_DATA_PATH`)
+   - `data/sample` 디렉토리를 참조하도록 데이터 및 UI 설정 경로를 추가했으며, 현재는 `KPI_SOURCE_DATA_PATH` 중심으로 운영
 
 2. **샘플 데이터 파일 분리 생성 (`data/sample/`)**
    - `ui_config.json`: 화면 별 헤더 제목, 설명, 사이드바 메뉴명, 드롭다운 옵션 등 공통 텍스트 관리
-   - `metrics.json`: 대시보드 상단 4개의 KPI 지표(총 고객 수, 활성 유저, 이탈률, 수익 등) 수치, 아이콘, 증감률 관리
-   - `chart_data.csv`: 메인 트렌드 차트에 그려질 활성 사용자 시계열 데이터 관리
+   - `netflix_user_sample.csv`: 대시보드 KPI/트렌드 집계용 사용자 샘플 데이터 관리
 
 3. **데이터 로더 유틸리티 작성 (`src/utils/data_loader.py`)**
    - JSON 및 CSV 데이터를 파싱하는 함수 구현
@@ -23,8 +22,8 @@
 4. **UI 컴포넌트 데이터 연동**
    - `src/components/sidebar.py`: `ui_config.json`을 읽어와 동적으로 메뉴 및 사이드바 텍스트 구성
    - `src/screens/dashboard.py`, `analysis.py`, `model.py`: 화면별 페이지 헤더 및 설명 텍스트 연동
-   - `src/components/metrics.py`: `metrics.json`을 기반으로 반복문(loop)을 통한 KPI 카드 렌더링 적용
-   - `src/components/charts.py`: `chart_data.csv`의 데이터를 DataFrame으로 로드하여 `st.line_chart` 렌더링에 적용
+   - `src/components/metrics.py`: 샘플 사용자 데이터 집계 결과를 기반으로 KPI 카드 렌더링 적용
+   - `src/components/charts.py`: 샘플 사용자 데이터에서 가공한 연령대별 활성 유저 비교 차트를 렌더링하도록 적용
 
 ## 2026년 03월 28일 추가 작업 내역
 - **config 구조 개편**: `data/sample` 디렉토리에 위치해 있던 UX/UI 관련 구성용 파일(`ui_config.json`, `metrics.json`)을 단순 데이터 파일과 구분하기 위해 `src/config` 디렉토리로 이동시켰습니다.
@@ -35,7 +34,7 @@
 - **적용 함수**: [`src/design/styles.py`](../../src/design/styles.py)에 `apply_streamlit_page_config()`를 추가해 `load_ui_config()`로 `app` 블록을 읽은 뒤 `st.set_page_config`를 호출합니다. 앱 엔트리 [`main.py`](../../main.py)에서는 해당 함수만 호출하도록 정리했습니다.
 
 ## 2026년 03월 28일 HTML 마크업 집약 (별도 기록)
-- `st.html`용 HTML 조각을 [`src/design/markup.py`](../../src/design/markup.py)로 모으고, 대시보드 하단 3모듈 데이터는 [`data/sample/dashboard_modules.json`](../../data/sample/dashboard_modules.json), 분석 화면 비교/AI 문구는 `ui_config.json`의 `analysis.compare_cards`·`ai_comment` 등으로 이전했습니다. 상세 체크리스트·비고는 [`docs/plans/front_html_markup_refactor.md`](front_html_markup_refactor.md)를 참고하세요.
+- `st.html`용 HTML 조각을 [`src/design/markup.py`](../../src/design/markup.py)로 모으고, 대시보드 하단 3모듈 데이터는 [`src/config/dashboard_modules.json`](../../src/config/dashboard_modules.json), 분석 화면 비교/AI 문구는 `ui_config.json`의 `analysis.compare_cards`·`ai_comment` 등으로 이전했습니다. 상세 체크리스트·비고는 [`docs/plans/front_html_markup_refactor.md`](front_html_markup_refactor.md)를 참고하세요.
 
 ## 향후 계획
 - 루트 디렉토리의 `data/sample` 폴더를 활용하여 구조를 정립 완료.

@@ -19,7 +19,7 @@ def _safe(s: str) -> str:
     return html.escape(str(s), quote=True)
 
 
-def _safe_hex_color(value: str, *, fallback: str = "#94a3b8") -> str:
+def _safe_hex_color(value: str, *, fallback: str = COLORS["text_soft"]) -> str:
     """`style`에 넣는 배경색만 허용 (#RRGGBB). 그 외 값은 fallback으로 대체."""
     if isinstance(value, str) and re.fullmatch(r"#[0-9A-Fa-f]{6}", value):
         return value
@@ -109,7 +109,9 @@ def metric_card_html(
     emoji: str = "",
 ) -> str:
     """대시보드 상단 KPI 4칸 (`get_metrics_css`의 `.metric-card`·`.change-tag`)."""
+    # 증감 방향에 따라 CSS 클래스(초록/빨강)를 선택합니다.
     change_class = "positive" if is_positive else "negative"
+    # 이모지는 선택값이라 비어 있으면 span만 빈 상태로 렌더됩니다.
     em = _safe(emoji) if emoji else ""
     return dedent(f"""
         <div class="metric-card h-full">
@@ -147,16 +149,16 @@ def analysis_kpi_current_card(
 ) -> str:
     """우측 열: 베이스라인 이탈율 카드 (회색 좌측 보더·Current 뱃지)."""
     return dedent(f"""
-            <div class="metric-card" style="border-left: 4px solid #e2e8f0; padding: 1rem;">
+            <div class="metric-card" style="border-left: 4px solid {COLORS['border']}; padding: 1rem;">
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-                        <span style="padding: 0.35rem; background-color: #f1f5f9; border-radius: 0.5rem; color: #94a3b8; display: inline-flex; font-size: 1rem;">
+                        <span style="padding: 0.35rem; background-color: {COLORS['info_light']}; border-radius: 0.5rem; color: {COLORS['text_soft']}; display: inline-flex; font-size: 1rem;">
                             <span class="material-symbols-outlined" style="font-size: 1.1rem;">trending_flat</span>
                         </span>
-                        <span style="font-size: 0.65rem; font-weight: 700; color: #94a3b8; background-color: #f8fafc; padding: 0.2rem 0.45rem; border-radius: 0.25rem;">{_safe(badge_current)}</span>
+                        <span style="font-size: 0.65rem; font-weight: 700; color: {COLORS['text_soft']}; background-color: {COLORS['background']}; padding: 0.2rem 0.45rem; border-radius: 0.25rem;">{_safe(badge_current)}</span>
                     </div>
-                    <p style="font-size: 0.55rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 0.15rem 0;">{_safe(kpi_label)}</p>
-                    <p style="font-size: 1.4rem; font-weight: 900; color: #0f172a; margin: 0; line-height: 1.2;">{current_prob}%</p>
+                    <p style="font-size: 0.55rem; font-weight: 700; color: {COLORS['text_muted']}; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 0.15rem 0;">{_safe(kpi_label)}</p>
+                    <p style="font-size: 1.4rem; font-weight: 900; color: {COLORS['text_main']}; margin: 0; line-height: 1.2;">{current_prob}%</p>
                 </div>
             </div>
             """).strip()
@@ -172,8 +174,9 @@ def analysis_kpi_simulated_card(
     delta_bg: str,
 ) -> str:
     """우측 열: 시뮬 결과 이탈율 카드 (primary 좌측 보더·델타 뱃지·트렌드 아이콘)."""
-    dc = _safe_hex_color(delta_color, fallback="#dc2626")
-    dbg = _safe_hex_color(delta_bg, fallback="#fef2f2")
+    # 주입된 색상 값은 안전한 hex인지 검증 후 fallback을 적용합니다.
+    dc = _safe_hex_color(delta_color, fallback=COLORS["danger"])
+    dbg = _safe_hex_color(delta_bg, fallback=COLORS["primary_light"])
     return dedent(f"""
             <div class="metric-card" style="border-left: 4px solid {COLORS['primary']}; padding: 1rem;">
                 <div>
@@ -183,7 +186,7 @@ def analysis_kpi_simulated_card(
                         </span>
                         <span style="font-size: 0.65rem; font-weight: 700; color: {dc}; background-color: {dbg}; padding: 0.2rem 0.45rem; border-radius: 0.25rem;">{_safe(delta_text)}</span>
                     </div>
-                    <p style="font-size: 0.55rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 0.15rem 0;">{_safe(kpi_label)}</p>
+                    <p style="font-size: 0.55rem; font-weight: 700; color: {COLORS['text_muted']}; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 0.15rem 0;">{_safe(kpi_label)}</p>
                     <p style="font-size: 1.4rem; font-weight: 900; color: {COLORS['primary']}; margin: 0; line-height: 1.2;">{projected_prob}%</p>
                 </div>
             </div>
@@ -200,13 +203,14 @@ def analysis_ai_comment_card(
     is_high_risk: bool,
 ) -> str:
     """요약 문단 (`chart-card` 박스 + 위험도별 아이콘·배경 톤)."""
+    # 템플릿은 {segment}/{projected} 자리만 치환하고 나머지는 그대로 유지합니다.
     summary = summary_template.format(
         segment=_safe(segment_name),
         projected=_safe(f"{projected_prob}%"),
     )
     badge = "primary" if is_high_risk else "positive"
-    bg = "#fef2f2" if is_high_risk else "#f0fdf4"
-    risk_color = "#dc2626" if is_high_risk else "#16a34a"
+    bg = COLORS["primary_light"] if is_high_risk else COLORS["success_light"]
+    risk_color = COLORS["danger"] if is_high_risk else COLORS["success"]
     risk_icon = "warning" if is_high_risk else "check_circle"
     return dedent(f"""
         <div class="chart-card" style="padding: 1rem 1.25rem;">
@@ -216,7 +220,7 @@ def analysis_ai_comment_card(
                 </div>
                 <h3 style="font-size: 0.98rem; font-weight: 700; margin: 0;">{_safe(title)}</h3>
             </div>
-            <p style="color: #475569; font-size: 0.75rem; line-height: 1.55; margin: 0;">
+            <p style="color: {COLORS['text_muted']}; font-size: 0.75rem; line-height: 1.55; margin: 0;">
                 {summary}
                 <br><br>
                 {_safe(risk_text)}
@@ -248,10 +252,10 @@ def dashboard_plan_module(payload: dict) -> str:
             dedent(f"""
                 <div>
                     <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem;">
-                        <span style="color: #475569;">{lbl}</span>
-                        <span style="color: #0f172a;">{pct}%</span>
+                        <span style="color: {COLORS['text_muted']};">{lbl}</span>
+                        <span style="color: {COLORS['text_main']};">{pct}%</span>
                     </div>
-                    <div style="height: 0.375rem; width: 100%; background-color: #f1f5f9; border-radius: 9999px; overflow: hidden;">
+                    <div style="height: 0.375rem; width: 100%; background-color: {COLORS['border']}; border-radius: 9999px; overflow: hidden;">
                         <div style="height: 100%; background-color: {bc}; width: {pct}%;"></div>
                     </div>
                 </div>
@@ -276,9 +280,9 @@ def dashboard_churn_reasons_module(payload: dict) -> str:
     for r in payload["rows"]:
         rows_html.append(
             dedent(f"""
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background-color: #f8fafc; border-radius: 0.5rem;">
-                    <span style="font-size: 0.6875rem; font-weight: 700; color: #475569;">{_safe(r["label"])}</span>
-                    <span style="font-size: 0.75rem; font-weight: 900; color: #b91c1c;">{_safe(r["value"])}</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background-color: {COLORS['background']}; border-radius: 0.5rem;">
+                    <span style="font-size: 0.6875rem; font-weight: 700; color: {COLORS['text_muted']};">{_safe(r["label"])}</span>
+                    <span style="font-size: 0.75rem; font-weight: 900; color: {COLORS['primary_dark']};">{_safe(r["value"])}</span>
                 </div>
             """).strip()
         )
@@ -305,8 +309,8 @@ def dashboard_sessions_module(payload: dict) -> str:
                 <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
                     <div style="width: 0.5rem; height: 0.5rem; margin-top: 0.375rem; border-radius: 9999px; background-color: {dc}; flex-shrink: 0;"></div>
                     <div>
-                        <p style="font-size: 0.75rem; font-weight: 700; color: #1e293b; margin: 0 0 0.25rem 0;">{_safe(r["title"])}</p>
-                        <p style="font-size: 0.5625rem; font-weight: 500; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">{_safe(r["meta"])}</p>
+                        <p style="font-size: 0.75rem; font-weight: 700; color: {COLORS['text_main']}; margin: 0 0 0.25rem 0;">{_safe(r["title"])}</p>
+                        <p style="font-size: 0.5625rem; font-weight: 500; color: {COLORS['text_soft']}; text-transform: uppercase; letter-spacing: 0.05em; margin: 0;">{_safe(r["meta"])}</p>
                     </div>
                 </div>
             """).strip()
