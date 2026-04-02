@@ -1,4 +1,4 @@
-# 🎬 SKN27-2ND-2TEAM 프로젝트
+<img width="1024" height="683" alt="image" src="https://github.com/user-attachments/assets/ec91ae50-1703-4fca-8e7a-e51c12f1e715" /># 🎬 SKN27-2ND-2TEAM 프로젝트
 
 ### 2차 프로젝트: 넷플릭스 고객 이탈 분석 및 예측
 **개발 기간:** 2026.03.25 - 2026.04.02
@@ -16,8 +16,8 @@
 ---
 
 ## 1. 프로젝트 개요
+> <img width="512" alt="8ed5a8dc-87e8-4839-9299-7a76b65fdfe4" src="https://github.com/user-attachments/assets/ba3301a1-ac05-416a-8937-e2257d052866" />
 
-> <img src="https://cdn.newstnt.com/news/photo/202511/557388_583957_1951.jpg" width="600">
 >
 > OTT 시장의 경쟁 심화로 인해 신규 고객 유치보다 기존 고객의 유지(Retention)가 기업 성장의 핵심 지표가 됨. 본 프로젝트는 Kaggle의 넷플릭스 유저 데이터를 활용하여 시청 패턴, 구독 정보, 기기 사용 습관을 분석하고 **이탈 가능성이 높은 유저를 사전에 식별**하는 예측 모델 구축을 목표.
 
