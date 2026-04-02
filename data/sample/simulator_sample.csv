@@ -1,5 +1,6 @@
-segment_name,base_churn_prob,subscription_type,monthly_revenue,viewing_hours,customer_support_calls
-신규 가입자 (1개월 미만),18.0,Basic,9.99,15.0,2
-일반 사용자 (Standard),15.5,Standard,15.99,35.5,1
-충성 고객 (Premium),5.0,Premium,22.99,60.0,0
-위험군 (문의 다수),35.0,Standard,15.99,20.0,5
+segment_name,segment_size,subscription_plan,primary_device,household_size
+프리미엄_가입군 (우선순위1: 요금제 Premium 또는 Premium+),3828,Premium,Desktop,2.0
+모바일_주사용군 (우선순위2: 1번 제외 · 주기기 Mobile),729,Standard,Mobile,2.0
+다인가구군 (우선순위3: 1~2번 제외 · 가구원 3명 이상),1668,Standard,Desktop,4.0
+장기가입군 (우선순위4: 1~3번 제외 · 가입연도 start_year≤2023),1021,Standard,Laptop,1.0
+일반_안정군 (우선순위5: 위 1~4 해당 없음),1233,Standard,Laptop,1.0
