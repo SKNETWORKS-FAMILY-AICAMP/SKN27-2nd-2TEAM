@@ -1,44 +1,46 @@
 {
+  "_note": "주석 :: 데이터가 아직 확정되지 않아서 고정 값으로 수치들을 배치함 ",
+
   "plan_distribution": {
     "title": "구독 플랜별 분포",
     "icon": "pie_chart",
     "icon_badge": "secondary",
     "rows": [
-      {"label": "Premium (4K)", "pct": 48, "bar_color": "#b91c1c"},
-      {"label": "Standard (HD)", "pct": 34, "bar_color": "#2563eb"},
-      {"label": "Basic with Ads", "pct": 18, "bar_color": "#94a3b8"}
+      {"label": "Standard", "pct": 40, "bar_color": "#2563eb"},
+      {"label": "Premium", "pct": 30, "bar_color": "#b91c1c"},
+      {"label": "Basic", "pct": 30, "bar_color": "#94a3b8"}
     ]
   },
   "churn_reasons": {
-    "title": "주요 이탈 사유",
-    "icon": "format_list_bulleted",
+    "title": "행동 인게이지먼트 지표",
+    "icon": "insights",
     "icon_badge": "orange",
     "rows": [
-      {"label": "보고 싶은 콘텐츠 부족", "value": "32%"},
-      {"label": "가격 부담 (구독료)", "value": "28%"},
-      {"label": "타 서비스 이동", "value": "22%"},
-      {"label": "사용 빈도 감소", "value": "18%"}
+      {"label": "평균 완주율", "value": "64.53%"},
+      {"label": "추천 클릭률 평균", "value": "49.56%"},
+      {"label": "멀티 디바이스 이용 비중", "value": "66.48%"},
+      {"label": "하이 빈지 사용자 비중", "value": "33.57%"}
     ]
   },
   "recent_sessions": {
-    "title": "최근 분석 세션",
-    "icon": "history",
+    "title": "데이터 카테고리",
+    "icon": "dataset",
     "icon_badge": "tertiary",
     "rows": [
       {
         "dot_color": "#22c55e",
-        "title": "APAC 지역 이탈 패턴 분석 완료",
-        "meta": "5분 전 • AI Agent Alpha"
-      },
-      {
-        "dot_color": "#f97316",
-        "title": "광고 요금제 전환율 감소 감지",
-        "meta": "2시간 전 • Batch #402"
+        "title": "국가 커버리지: 10개국",
+        "meta": "country 기준 고유값"
       },
       {
         "dot_color": "#3b82f6",
-        "title": "분기별 리텐션 보고서 생성",
-        "meta": "4시간 전 • System Admin"
+        "title": "장르 카테고리: 8개",
+        "meta": "favorite_genre 기준 고유값"
+      },
+      {
+        "dot_color": "#f97316",
+        "title": "결제수단 유형: 4개",
+        "meta": "payment_method 기준 고유값"
       }
     ]
   }

@@ -37,9 +37,8 @@ Streamlit의 기본 레이아웃 제약을 극복하고 커스텀 디자인을 �
 
 *   **위치:** `data/sample/` 디렉토리 내의 `.csv` 파일
 *   **예시 파일:**
-    *   `dashboard_metrics.csv` : 대시보드 상단 KPI 카드에 들어갈 통계치 데이터
+    *   `netflix_user_sample.csv` : 대시보드 KPI/트렌드 집계의 원천 사용자 샘플 데이터
     *   `simulator_sample.csv` : 이탈 시뮬레이터 폼 렌더링 시 사용할 기본 설정값(디폴트 파라미터)
-    *   `chart_data.csv` : 시계열 차트 등을 그리기 위한 샘플 데이터
 *   **활용 방법:**
     *   모든 데이터 로딩은 파이썬 내에서 파일 경로를 직접 열지 않고, **`src/utils/data_loader.py`** 에 정의된 전용 로드 함수(예: `load_metrics_data()`, `load_simulator_data()`)를 사용합니다.
     *   반드시 성능 최적화를 위해 `@st.cache_data` 데코레이터를 적용합니다.

@@ -17,11 +17,13 @@ def render_dashboard():
     메인 대시보드 화면을 렌더링합니다.
     _1/code.html 의 메인 컨텐츠 영역에 해당합니다.
     """
+    # 홈 헤더 문구는 설정 파일을 단일 소스로 사용합니다.
     ui_config = load_ui_config()
     header_config = ui_config["dashboard"]["header"]
 
     st.html(markup.page_header_simple(header_config["title"], header_config["description"]))
 
+    # 상단 KPI -> 트렌드 -> 하단 모듈 순으로 화면을 조립합니다.
     render_metrics_row()
 
     st.html(markup.spacer_std())
